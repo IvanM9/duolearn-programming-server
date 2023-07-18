@@ -15,10 +15,10 @@
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// This can be used to network with other containers or with the host.
-	"forwardPorts": [3000, 5432],
+	"forwardPorts": [3001, 7000],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "npm install --legacy-peer-deps",
+	"postCreateCommand": "yarn install --legacy-peer-deps",
 
 	// Configure tool-specific properties.
 	"customizations": {"vscode": {"extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode", "github.copilot", 
