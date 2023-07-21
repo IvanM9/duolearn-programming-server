@@ -1,5 +1,5 @@
 import * as url from 'url';
-import { Pool, Client } from 'pg';
+import { Client } from 'pg';
 require('dotenv').config();
 
 export class Conexion {
@@ -99,11 +99,43 @@ export class Conexion {
     }
   }
 
-  async executeProcedureReturnsScalar(name: string, params: any[] | null) {
+  async executeProcedureReturnsString(name: string, params: any[] | null): Promise<string> {
     try {
       const scalar = await this.executeProcedure(name, params);
 
       if (Array.isArray(scalar)) throw new Error('El procedimiento almacenado no devuelve un valor escalar');
+
+      if (typeof scalar !== 'string') throw new Error('El valor que retorna no es de tipo String');
+
+      console.log(scalar);
+      return scalar;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async executeProcedureReturnsInt(name: string, params: any[] | null): Promise<number> {
+    try {
+      const scalar = await this.executeProcedure(name, params);
+
+      if (Array.isArray(scalar)) throw new Error('El procedimiento almacenado no devuelve un valor escalar');
+
+      if (typeof scalar !== 'number') throw new Error('El valor que retorna no es de tipo Int');
+
+      console.log(scalar);
+      return scalar;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async executeProcedureReturnsBoolean(name: string, params: any[] | null): Promise<boolean> {
+    try {
+      const scalar = await this.executeProcedure(name, params);
+
+      if (Array.isArray(scalar)) throw new Error('El procedimiento almacenado no devuelve un valor escalar');
+
+      if (typeof scalar !== 'boolean') throw new Error('El valor que retorna no es de tipo Boolean');
 
       console.log(scalar);
       return scalar;
