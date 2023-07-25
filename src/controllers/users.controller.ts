@@ -58,7 +58,7 @@ export class UserController {
   async iniciarSesion(@Req() req, @Res() res) {
     try {
       const { usuario, clave } = req.body;
-      console.log(req.body)
+      
       if (usuario.length > 0 && clave.length > 0) {
         let datos = await this.user.inciarSesion(usuario, clave);
         if (datos !== 0 && datos !== null) {

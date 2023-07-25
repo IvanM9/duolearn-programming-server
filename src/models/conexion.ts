@@ -1,5 +1,5 @@
 import * as url from 'url';
-import { Client, Pool } from 'pg';
+import { Client, Pool, PoolConfig } from 'pg';
 require('dotenv').config();
 
 export class Conexion {
@@ -16,9 +16,7 @@ export class Conexion {
         host: params.hostname,
         port: params.port,
         database: params.pathname.split('/')[1],
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        
       };
     } else {
       this.config = {
@@ -29,6 +27,11 @@ export class Conexion {
         port: '5432',
       };
     }
+
+    this.config.ssl = {
+      rejectUnauthorized: false,
+    };
+    
     this.database = new Pool(this.config);
     if (this.database.connect()) console.log('Conexion exitosa');
     else console.log('Conexion fallida');
