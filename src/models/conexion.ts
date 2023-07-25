@@ -79,7 +79,7 @@ export class Conexion {
     }
   }
 
-  async executeProcedureReturnsTable(name: string, params: any[] | null) {
+  async executeProcedureReturnsTable(name: string, params?: any[] | null) {
     try {
       const table = await this.executeProcedure(name, params);
 

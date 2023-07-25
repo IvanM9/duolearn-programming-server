@@ -1,5 +1,7 @@
 import { Conexion } from "@/models/conexion";
+import { Service } from "typedi";
 
+@Service()
 export class ActivitiesService {
     private conexion: Conexion;
 

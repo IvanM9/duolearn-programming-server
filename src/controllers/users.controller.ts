@@ -5,47 +5,233 @@ import { CreateUserDto } from '@dtos/users.dto';
 import { User } from '@interfaces/users.interface';
 import { ValidationMiddleware } from '@middlewares/validation.middleware';
 import { UserService } from '@services/users.service';
+const jwt = require('jsonwebtoken');
 
 @Controller()
 export class UserController {
-  public path = '/users'
   public user = Container.get(UserService);
+  //Configuración para el envío de correos
+  // const client_id = "670624648440-p8o6pnd7pan6cfi8922goq645pr9nnds.apps.googleusercontent.com";
+  // const client_secret = "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";
 
-  @Get('/users')
-  @OpenAPI({ summary: 'Return a list of users' })
-  async getUsers() {
-    const findAllUsersData: User[] = await this.user.findAllUser();
-    return { data: findAllUsersData, message: 'findAll' };
+  @Get("/admin/usuarios/listar")
+  async listarUsuarios(req, res) {
+    try {
+      const datos = await this.user.listarUsuarios();
+      res.json(datos);
+    } catch (error) {
+      console.log(error);
+      res.json({ estado: 0 });
+    }
   }
 
-  @Get('/users/:id')
-  @OpenAPI({ summary: 'Return find a user' })
-  async getUserById(@Param('id') userId: number) {
-    const findOneUserData: User = await this.user.findUserById(userId);
-    return { data: findOneUserData, message: 'findOne' };
+  //Se obtiene los datos del usuario 
+  @Get("/usuario/datos/:usuario")
+  async getUsuario(req, res) {
+    try {
+      const { usuario } = req.params;
+      console.log(usuario);
+      if (usuario != null) {
+        let datos = await this.user.getUser(usuario);
+        if (datos != null) {
+          datos.estado = "1";
+          res.json(datos);
+        }
+        else
+          res.json({ estado: "0" });
+      }
+      else
+        res.json({ estado: "0" });
+    }
+    catch (error) {
+      console.error();
+      res.json({ estado: 0 });
+    }
   }
 
-  @Post('/users')
-  @HttpCode(201)
-  @UseBefore(ValidationMiddleware(CreateUserDto, 'body'))
-  @OpenAPI({ summary: 'Create a new user' })
-  async createUser(@Body() userData: User) {
-    const createUserData: User = await this.user.createUser(userData);
-    return { data: createUserData, message: 'created' };
+  //Se verifica que los datos no estén vacios y 
+  //se obtienen una verificación de que son correctos
+
+  @Post("/iniciar_sesion")
+  async iniciarSesion(req, res) {
+    try {
+      const { usuario, clave } = req.body;
+      if (usuario.length > 0 && clave.length > 0) {
+        let datos = await this.user.inciarSesion(usuario, clave);
+        if (datos !== 0 && datos !== null) {
+          res.json({ mensaje: "Sesion iniciada", estado: "1" });
+        }
+        else
+          res.json({ mensaje: "Ingreso fallido", estado: "0" });
+      }
+      else
+        res.json({ mensaje: "campos vacios", estado: "0" });
+    }
+    catch (error) {
+      console.log(error);
+      res.json({ estado: 0 });
+    }
   }
 
-  @Put('/users/:id')
-  @UseBefore(ValidationMiddleware(CreateUserDto, 'body', true))
-  @OpenAPI({ summary: 'Update a user' })
-  async updateUser(@Param('id') userId: number, @Body() userData: User) {
-    const updateUserData: User[] = await this.user.updateUser(userId, userData);
-    return { data: updateUserData, message: 'updated' };
+  //Se obtienen todos los datos y luego se reemplaza con los valores actuales
+  @Get("/usuario/modificar")
+  async modificarUsuario(req, res) {
+    try {
+      const { usuario } = req.body;
+      if (usuario != null) {
+        const { nombres, apellidos, correo, fecha_nacimiento } = req.body;
+        let status = await this.user.modificarUser(usuario, nombres, apellidos, correo, fecha_nacimiento);
+        console.log(status);
+        if (status === 1)
+          res.json({ mensaje: "Modificado con exito", estado: "1" });
+        else
+          res.json({ mensaje: "Modificación fallida ", estado: "0" });
+      }
+      else
+        res.json({ mensaje: "El usuario no ha iniciado la sesión ", estado: "0" });
+    } catch (error) {
+      res.json({ mensaje: "Error: " + error, estado: "0" });
+    }
   }
 
-  @Delete('/users/:id')
-  @OpenAPI({ summary: 'Delete a user' })
-  async deleteUser(@Param('id') userId: number) {
-    const deleteUserData: User[] = await this.user.deleteUser(userId);
-    return { data: deleteUserData, message: 'deleted' };
+  //Se registra un nuevo usuario
+  @Post("/usuario/nuevo")
+  async nuevoUsuario(req, res) {
+    try {
+      const { usuario, nombres, apellidos, correo, clave, fecha_nacimiento } = req.body;
+      let status = await this.user.registrarUser(usuario, nombres, apellidos, correo, clave, fecha_nacimiento);
+      if (status === 1)
+        res.json({ mensaje: "Registro correcto", estado: "1" });
+      else
+        res.json({ mensaje: "Registro fallido", estado: "0" });
+    }
+    catch (error) {
+      console.log(error);
+      res.json({ estado: 0 });
+    }
   }
+
+  //Se elimina un usuario
+  @Delete("/usuario/eliminar/:usuario")
+  async elimnarUsuario(req, res) {
+    try {
+      const usuario = req.params.usuario;
+      if (usuario != null) {
+        let status = await this.user.eliminarUser(usuario);
+        if (status === 1) {
+          res.json({ mensaje: "Eliminado con éxito ", estado: "1" });
+        }
+        else
+          res.json({ mensaje: "Eliminación fallido ", estado: "0" });
+
+      }
+      else
+        res.json({ mensaje: "El sesión no está iniciada", estado: "0" });
+    } catch (error) {
+      console.log(error);
+      res.json({ estado: 0 });
+    }
+  }
+
+
+  //Se envía un correo con una token temporal
+  //  solicitarClave = async (req, res) => {
+  //   try {
+  //       const { usuario } = req.params;
+  //       if (usuario != null) {
+
+  //           let link = await crearToken(usuario);
+  //           // console.log(link);
+  //           const access_Token = await oAuth2.getAccessToken();
+  //            var transporter = nodemailer.createTransport({
+  //              service: 'gmail',
+  //           //     auth: {
+  //           //         type: "OAuth2",
+  //           //         user: "doulearnp@gmail.com",
+  //           //         clientId: client_id,
+  //           //         clientSecret: client_secret,
+  //           //         refreshToken: "1//04n86mQeX3n5DCgYIARAAGAQSNwF-L9IrCtx-PWfdSOO-2xscnPX1wJ7jTMKRvRDoSc4NMP6NGQsYO3Odt9qXLG9J5zfN5N95U-0",
+  //           //         accessToken: access_Token
+  //           //     },
+  //           // });
+
+  //           let datos = await Usuario.getUser(usuario);
+  //           var mailOptions = {
+  //               from: "'Duolearn Admin' <doulearnp@gmail.com>",
+  //               to: datos.correo,
+  //               subject: "Reseteo de su clave duolearn",
+  //               text: "link de reseteo de su clave: " + link
+  //           };
+
+  //           await transporter.sendMail(mailOptions, function (error, info) {
+  //               if (error) {
+  //                   console.log(error);
+  //               } else {
+  //                   console.log('Email enviado: ' + info.response);
+  //               }
+  //           });
+  //           res.json({ estado: "1" });
+  //       }
+  //       else
+  //           res.json({ estado: "0" });
+  //   }
+  //   catch (error) {
+  //       console.log(error);
+  //       res.json({ estado: 0 });
+  //   }
+  // }
+
+  // Se genera un nuevo token para el cambio de contraseña 
+  //  private crearToken = async (usuario) => {
+  //   try {
+  //       let resetToken = jwt.sign({ username: usuario }, "studentreset", { expiresIn: '10m' });
+  //       await Usuario.asignarToken(usuario, resetToken);
+  //       return "http://localhost:4200/olvide-contrasenia/" + resetToken
+
+  //   } catch (error) {
+  //       return null;
+  //   }
+  // }
+
+  // Se ingresa nueva clave y se hace la verificación del token
+  @Post("/resetear_clave")
+  async resetearClave(req, res) {
+    try {
+      const { usuario, nueva_clave } = req.body;
+      const token = req.headers.reset;
+
+      jwt.verify(token, "studentreset", async (err, decoded) => {
+        await this.user.asignarToken(usuario, null);
+
+      });
+      let status = await this.user.resetClave(usuario, nueva_clave, token);
+      if (status != null && status != 0)
+        res.json({ mensaje: "clave cambiada exitosamente", estado: 1 });
+      else
+        res.json({ estado: "0" });
+
+    } catch (error) {
+      console.log(error);
+      res.json({ estado: "0", error });
+    }
+  }
+
+  //Cambio de clave
+  @Post("/cambio_clave")
+  async cambiarClave(req, res) {
+    try {
+      const { usuario, clave_actual, clave_nueva } = req.body;
+      let status = await this.user.cambiarClave(usuario, clave_actual, clave_nueva);
+      if (status === 1)
+        res.json({ estado: "1" });
+      else
+        res.json({ estado: "0" });
+    }
+    catch (error) {
+      console.log(error);
+      res.json({ estado: "0" });
+    }
+  }
+
+
 }
