@@ -14,11 +14,11 @@ export class ChatController{
             const { usuario, mensaje, fecha } = req.body;
             let status = await this.service.nuevoMensaje(usuario, mensaje, fecha);
             if (status != null)
-                res.json(status);
+                return status;
             else
-                res.json({ estado: 0 });
+                return { estado: 0 };
         } catch (error) {
-            res.json({ estado: 0 });
+            return { estado: 0 };
         }
     }
     
@@ -29,11 +29,11 @@ export class ChatController{
         try {
             let datos = await this.service.obtenerMensajes();
             if (datos != null)
-                res.json(datos);
+                return datos;
             else
-                res.json({ estado: 0 });
+                return { estado: 0 };
         } catch (error) {
-            res.json({ estado: 0 });
+            return { estado: 0 };
         }
     }
 }

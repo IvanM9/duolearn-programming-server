@@ -16,11 +16,11 @@ export class StadisticsController {
             console.log(usuario);
             let datos = await this.service.getJava(usuario);
             if (datos != null)
-                res.json(datos);
+                return datos;
             else
-                res.json({ menssage: 'error', estado: 0 });
+                return { menssage: 'error', estado: 0 };
         } catch (error) {
-            res.json({ estado: 0 });
+            return { estado: 0 };
         }
     }
 
@@ -33,11 +33,11 @@ export class StadisticsController {
             const { usuario } = req.params;
             let datos = await this.service.getCsharp(usuario);
             if (datos != null)
-                res.json(datos);
+                return datos;
             else
-                res.json({ menssage: 'error', estado: 0 });
+                return { menssage: 'error', estado: 0 };
         } catch (error) {
-            res.json({ estado: 0 });
+            return { estado: 0 };
         }
 
     }

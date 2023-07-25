@@ -30,14 +30,14 @@ export class ActivitiesController {
             const { modulo, lenguaje, tipo, usuario } = req.body;
             let datos = await this.activity.obtenerActividades(modulo, lenguaje, tipo, usuario);
             if (datos != null) {
-                res.json(datos);
+                return datos;
             }
             else
-                res.json({ mensaje: "vacio", estado: "0" });
+                return { mensaje: "vacio", estado: "0" };
         }
         catch (error) {
             console.log(error);
-            res.json({ mensaje: "vacio", estado: "0" });
+            return { mensaje: "vacio", estado: "0" };
 
         }
     }
@@ -56,15 +56,15 @@ export class ActivitiesController {
             const { usuario, id_actividad, fecha, minutos, intentos, num_actividad, puntaje } = req.body;
             if (usuario != null) {
                 let datos = await this.activity.resolverActividad(usuario, id_actividad, fecha, minutos, intentos, num_actividad, puntaje);
-                res.json({ estado: datos });
+                return { estado: datos };
 
             }
             else
-                res.json({ mensaje: "Usuario desconectado", estado: "0" });
+                return { mensaje: "Usuario desconectado", estado: "0" };
         }
         catch (error) {
             console.log(error);
-            res.json({ estado: "0" });
+            return { estado: "0" };
 
         }
     }
@@ -115,12 +115,12 @@ export class ActivitiesController {
             }
 
 
-            res.json({ estado: status });
+            return { estado: status };
 
         }
         catch (error) {
             console.log(error);
-            res.json({ estado: "0" });
+            return { estado: "0" };
         }
     }
 
@@ -136,13 +136,13 @@ export class ActivitiesController {
             const { modulo, lenguaje, titulo, concepto } = req.body;
             let status = await this.activity.añadirTema(modulo, lenguaje, titulo, concepto);
             if (status != null)
-                res.json({ estado: status });
+                return { estado: status };
             else
-                res.json({ estado: 0 });
+                return { estado: 0 };
         }
         catch (error) {
             console.log(error);
-            res.json({ estado: 0 });
+            return { estado: 0 };
         }
     }
 
@@ -157,9 +157,9 @@ export class ActivitiesController {
         try {
             const { id, modulo, lenguaje, titulo, concepto } = req.body;
             let status = await this.activity.modificarTema(id, modulo, lenguaje, titulo, concepto);
-            res.json({ estado: status });
+            return { estado: status };
         } catch (error) {
-            res.json({ estado: "0" });
+            return { estado: "0" };
         }
     }
 
@@ -174,9 +174,9 @@ export class ActivitiesController {
         try {
             const { id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo } = req.body;
             let status = await this.activity.modificarActividad(id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo);
-            res.json({ estado: status });
+            return { estado: status };
         } catch (error) {
-            res.json({ estado: "0" });
+            return { estado: "0" };
         }
     }
 
@@ -191,9 +191,9 @@ export class ActivitiesController {
         try {
             const { id } = req.params;
             let status = await this.activity.eliminarActividad(id);
-            res.json({ estado: status });
+            return { estado: status };
         } catch (error) {
-            res.json({ estado: "0" });
+            return { estado: "0" };
         }
     }
 
@@ -208,9 +208,9 @@ export class ActivitiesController {
         try {
             const { id } = req.params;
             let status = await this.activity.eliminarTema(id);
-            res.json({ estado: status });
+            return { estado: status };
         } catch (error) {
-            res.json({ estado: "0" });
+            return { estado: "0" };
         }
     }
 
@@ -226,13 +226,13 @@ export class ActivitiesController {
             const { modulo, lenguaje } = req.body;
             let datos = await this.activity.obtenerTemas(modulo, lenguaje);
             if (datos != null) {
-                res.json(datos);
+                return datos;
             }
             else
-                res.json({ estado: 0 });
+                return { estado: 0 };
         } catch (error) {
             console.log(error);
-            res.json({ estado: 0 });
+            return { estado: 0 };
         }
     }
 
@@ -247,12 +247,12 @@ export class ActivitiesController {
         try {
             let datos = await this.activity.listarTemas();
             if (datos != null)
-                res.json(datos);
+                return datos;
             else
-                res.json({ estado: 0 });
+                return { estado: 0 };
         } catch (error) {
             console.log(error);
-            res.json({ estado: 0 });
+            return { estado: 0 };
         }
     }
 }

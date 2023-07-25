@@ -29,11 +29,7 @@ export class UserService {
   //Llama a la función para obtener los datos de 1 usuario
   getUser = async (usuario) => {
     try {
-      let datos = await this.conexion.executeProcedureReturnsTable("obtener_usuario", [usuario]);
-      if (datos.rowCount > 0)
-        return datos.rows[0].obtener_usuario;
-      else
-        return null;
+      return await this.conexion.executeProcedureReturnsTable("obtener_usuario", [usuario]);
     } catch (error) {
       console.log(error);
       return null;

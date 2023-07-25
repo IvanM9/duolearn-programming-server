@@ -19,10 +19,10 @@ export class UserController {
   async listarUsuarios(@Req() req, @Res() res) {
     try {
       const datos = await this.user.listarUsuarios();
-      res.json(datos);
+      return datos;
     } catch (error) {
       console.log(error);
-      res.json({ estado: 0 });
+      return { estado: 0 };
     }
   }
 
@@ -31,22 +31,23 @@ export class UserController {
   async getUsuario(@Req() req, @Res() res) {
     try {
       const { usuario } = req.params;
-      console.log(usuario);
+
       if (usuario != null) {
         let datos = await this.user.getUser(usuario);
+        console.log(datos)
         if (datos != null) {
           datos.estado = "1";
-          res.json(datos);
+          return datos;
         }
         else
-          res.json({ estado: "0" });
+          return { estado: "0" };
       }
       else
-        res.json({ estado: "0" });
+        return { estado: "0" };
     }
     catch (error) {
       console.error();
-      res.json({ estado: 0 });
+      return { estado: 0 };
     }
   }
 
@@ -57,20 +58,21 @@ export class UserController {
   async iniciarSesion(@Req() req, @Res() res) {
     try {
       const { usuario, clave } = req.body;
+      console.log(req.body)
       if (usuario.length > 0 && clave.length > 0) {
         let datos = await this.user.inciarSesion(usuario, clave);
         if (datos !== 0 && datos !== null) {
-          res.json({ mensaje: "Sesion iniciada", estado: "1" });
+          return { mensaje: "Sesion iniciada", estado: "1" };
         }
         else
-          res.json({ mensaje: "Ingreso fallido", estado: "0" });
+          return { mensaje: "Ingreso fallido", estado: "0" };
       }
       else
-        res.json({ mensaje: "campos vacios", estado: "0" });
+        return { mensaje: "campos vacios", estado: "0" };
     }
     catch (error) {
       console.log(error);
-      res.json({ estado: 0 });
+      return { estado: 0 };
     }
   }
 
@@ -84,14 +86,14 @@ export class UserController {
         let status = await this.user.modificarUser(usuario, nombres, apellidos, correo, fecha_nacimiento);
         console.log(status);
         if (status === 1)
-          res.json({ mensaje: "Modificado con exito", estado: "1" });
+          return { mensaje: "Modificado con exito", estado: "1" };
         else
-          res.json({ mensaje: "Modificación fallida ", estado: "0" });
+          return { mensaje: "Modificación fallida ", estado: "0" };
       }
       else
-        res.json({ mensaje: "El usuario no ha iniciado la sesión ", estado: "0" });
+        return { mensaje: "El usuario no ha iniciado la sesión ", estado: "0" };
     } catch (error) {
-      res.json({ mensaje: "Error: " + error, estado: "0" });
+      return { mensaje: "Error: " + error, estado: "0" };
     }
   }
 
@@ -105,14 +107,14 @@ export class UserController {
       if (status == 1)
       {
         console.log(res);
-        res.json({ mensaje: "Registro correcto", estado: "1" });
+        return { mensaje: "Registro correcto", estado: "1" };
       }
       else
-        res.json({ mensaje: "Registro fallido", estado: "0" });
+        return { mensaje: "Registro fallido", estado: "0" };
     }
     catch (error) {
       console.log(error);
-      res.json({ estado: 0 });
+      return { estado: 0 };
     }
   }
 
@@ -124,10 +126,10 @@ export class UserController {
       if (usuario != null) {
         let status = await this.user.eliminarUser(usuario);
         if (status === 1) {
-          res.json({ mensaje: "Eliminado con éxito ", estado: "1" });
+          return { mensaje: "Eliminado con éxito ", estado: "1" };
         }
         else
-          res.json({ mensaje: "Eliminación fallido ", estado: "0" });
+          return { mensaje: "Eliminación fallido ", estado: "0" };
 
       }
       else
@@ -211,9 +213,9 @@ export class UserController {
       });
       let status = await this.user.resetClave(usuario, nueva_clave, token);
       if (status != null && status != 0)
-        res.json({ mensaje: "clave cambiada exitosamente", estado: 1 });
+        return { mensaje: "clave cambiada exitosamente", estado: 1 };
       else
-        res.json({ estado: "0" });
+        return { estado: "0" };
 
     } catch (error) {
       console.log(error);
@@ -228,13 +230,13 @@ export class UserController {
       const { usuario, clave_actual, clave_nueva } = req.body;
       let status = await this.user.cambiarClave(usuario, clave_actual, clave_nueva);
       if (status === 1)
-        res.json({ estado: "1" });
+        return { estado: "1" };
       else
-        res.json({ estado: "0" });
+        return { estado: "0" };
     }
     catch (error) {
       console.log(error);
-      res.json({ estado: "0" });
+      return { estado: "0" };
     }
   }
 

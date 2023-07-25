@@ -45,7 +45,7 @@ export class Conexion {
   private async queryWithValues(query: string, params: any[]): Promise<any> {
     this.connect();
     const data = await this.database.query(query, params);
-    this.desconect();
+    // this.desconect();
 
     return data;
   }
@@ -55,7 +55,7 @@ export class Conexion {
 
     const data = await this.database.query(query);
 
-    this.desconect();
+    //this.desconect();
 
     return data;
   }
