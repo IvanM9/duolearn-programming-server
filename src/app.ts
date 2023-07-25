@@ -13,6 +13,8 @@ import swaggerUi from 'swagger-ui-express';
 import { NODE_ENV, PORT, LOG_FORMAT, ORIGIN, CREDENTIALS } from '@config';
 import { ErrorMiddleware } from '@middlewares/error.middleware';
 import { logger, stream } from '@utils/logger';
+const multer = require('multer');
+import path from 'path';
 
 export class App {
   public app: express.Application;
@@ -43,6 +45,13 @@ export class App {
     return this.app;
   }
 
+  storage = multer.diskStorage({
+    destination: path.join(__dirname, 'public/uploads'),
+    filename: (req, files, cb) => {
+        cb(null, files.originalname);
+    }
+})
+
   private initializeMiddlewares() {
     this.app.use(morgan(LOG_FORMAT, { stream }));
     this.app.use(hpp());
@@ -51,6 +60,7 @@ export class App {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
+    this.app.use(multer({storage: this.storage}).array('images'));
   }
 
   private initializeRoutes(controllers: Function[]) {

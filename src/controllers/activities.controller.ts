@@ -1,4 +1,6 @@
+import { API_KEY, API_SECRET, CLOUD_NAME } from "@/config";
 import { ActivitiesService } from "@/services/activities.service";
+import { Request } from "express";
 import { Controller, Delete, Get, Post, Put, Req, Res } from "routing-controllers";
 import { OpenAPI } from "routing-controllers-openapi";
 import Container from "typedi";
@@ -12,9 +14,9 @@ export class ActivitiesController {
     
     constructor(){
         this.cloudinary.config({
-            cloud_name: 'dj86hmqil',
-            api_key: '622768815493224',
-            api_secret: '1e80pHQ9aT3ea-bOd_irltBWlNY'
+            cloud_name: CLOUD_NAME,
+            api_key: API_KEY,
+            api_secret: API_SECRET
         });
     }
   
