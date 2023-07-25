@@ -1,5 +1,5 @@
 import { ChatService } from "@/services/chat.service";
-import { Controller, Get, Post } from "routing-controllers";
+import { Controller, Get, Post, Req, Res } from "routing-controllers";
 import { OpenAPI } from "routing-controllers-openapi";
 import Container from "typedi";
 
@@ -9,7 +9,7 @@ export class ChatController{
 
     @Post("/chat/nuevo")
     @OpenAPI({summary:"Nuevo mensaje"})
-    async nuevoMensaje(req, res) {
+    async nuevoMensaje(@Req() req, @Res() res) {
         try {
             const { usuario, mensaje, fecha } = req.body;
             let status = await this.service.nuevoMensaje(usuario, mensaje, fecha);
@@ -25,7 +25,7 @@ export class ChatController{
     // Se obtiene toda la conversación
     @Get("/chat/obtener")
     @OpenAPI({summary:"Se obtiene toda la conversación"})
-    async obtenerMensajes (req, res) {
+    async obtenerMensajes (@Req() req, @Res() res) {
         try {
             let datos = await this.service.obtenerMensajes();
             if (datos != null)

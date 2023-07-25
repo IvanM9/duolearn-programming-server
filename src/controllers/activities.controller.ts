@@ -1,5 +1,5 @@
 import { ActivitiesService } from "@/services/activities.service";
-import { Controller, Delete, Get, Post, Put } from "routing-controllers";
+import { Controller, Delete, Get, Post, Put, Req, Res } from "routing-controllers";
 import { OpenAPI } from "routing-controllers-openapi";
 import Container from "typedi";
 
@@ -25,7 +25,7 @@ export class ActivitiesController {
             summary: 'Se obtiene las actividades por medio de varios restricciones'
         }
     )
-    async obtenerActividades (req, res){
+    async obtenerActividades (@Req() req, @Res() res){
         try {
             const { modulo, lenguaje, tipo, usuario } = req.body;
             let datos = await this.activity.obtenerActividades(modulo, lenguaje, tipo, usuario);
@@ -50,7 +50,7 @@ export class ActivitiesController {
             summary: 'Se envían los datos para registrar la actividad y su nota correspondiente'
         }
     )
-     async resolverActividad (req, res){
+     async resolverActividad (@Req() req, @Res() res){
         try {
 
             const { usuario, id_actividad, fecha, minutos, intentos, num_actividad, puntaje } = req.body;
@@ -76,7 +76,7 @@ export class ActivitiesController {
             summary: 'Se inserta una nueva actividad a la base de datos'
         }
     )
-     async agregarActividad (req, res) {
+     async agregarActividad (@Req() req, @Res() res) {
         try {
             const { tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo } = req.body;
             let status, _pregunta, _opcion1;
@@ -131,7 +131,7 @@ export class ActivitiesController {
             summary: 'Se inserta un nuevo tema '
         }
     )
-     async agregarTema (req, res) {
+     async agregarTema (@Req() req, @Res() res) {
         try {
             const { modulo, lenguaje, titulo, concepto } = req.body;
             let status = await this.activity.añadirTema(modulo, lenguaje, titulo, concepto);
@@ -153,7 +153,7 @@ export class ActivitiesController {
             summary: 'Se modifica un tema'
         }
     )
-     async modificarTema (req, res) {
+     async modificarTema (@Req() req, @Res() res) {
         try {
             const { id, modulo, lenguaje, titulo, concepto } = req.body;
             let status = await this.activity.modificarTema(id, modulo, lenguaje, titulo, concepto);
@@ -170,7 +170,7 @@ export class ActivitiesController {
             summary: 'Se modifica una actividad'
         }
     )
-     async modificarActividad (req, res) {
+     async modificarActividad (@Req() req, @Res() res) {
         try {
             const { id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo } = req.body;
             let status = await this.activity.modificarActividad(id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo);
@@ -187,7 +187,7 @@ export class ActivitiesController {
             summary: 'Se elimina una actividad'
         }
     )
-     async eliminarActividad (req, res) {
+     async eliminarActividad (@Req() req, @Res() res) {
         try {
             const { id } = req.params;
             let status = await this.activity.eliminarActividad(id);
@@ -204,7 +204,7 @@ export class ActivitiesController {
             summary: 'Se elimina un tema'
         }
     )
-     async eliminarTema (req, res) {
+     async eliminarTema (@Req() req, @Res() res) {
         try {
             const { id } = req.params;
             let status = await this.activity.eliminarTema(id);
@@ -221,7 +221,7 @@ export class ActivitiesController {
             summary: 'Se obtiene una la teoría correspondiente al módulo y al lenguaje'
         }
     )
-    async obtenerTemas (req, res) {
+    async obtenerTemas (@Req() req, @Res() res) {
         try {
             const { modulo, lenguaje } = req.body;
             let datos = await this.activity.obtenerTemas(modulo, lenguaje);
@@ -243,7 +243,7 @@ export class ActivitiesController {
             summary: 'Obtenemos todos los temas registrados'
         }
     )
-    async listarTemas (req, res) {
+    async listarTemas (@Req() req, @Res() res) {
         try {
             let datos = await this.activity.listarTemas();
             if (datos != null)

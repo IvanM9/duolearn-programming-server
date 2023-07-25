@@ -1,9 +1,9 @@
 import * as url from 'url';
-import { Client } from 'pg';
+import { Client, Pool } from 'pg';
 require('dotenv').config();
 
 export class Conexion {
-  private readonly database: Client;
+  private readonly database: Pool;
   private config: any;
   constructor() {
     if (process.env.DATABASE_URL) {
@@ -29,7 +29,7 @@ export class Conexion {
         port: '5432',
       };
     }
-    this.database = new Client(this.config);
+    this.database = new Pool(this.config);
     if (this.database.connect()) console.log('Conexion exitosa');
     else console.log('Conexion fallida');
   }
@@ -44,7 +44,7 @@ export class Conexion {
 
   private async queryWithValues(query: string, params: any[]): Promise<any> {
     this.connect();
-    const data = this.database.query(query, params);
+    const data = await this.database.query(query, params);
     this.desconect();
 
     return data;
@@ -53,7 +53,7 @@ export class Conexion {
   private async query(query: string) {
     this.connect();
 
-    const data = this.database.query(query);
+    const data = await this.database.query(query);
 
     this.desconect();
 
@@ -101,7 +101,7 @@ export class Conexion {
 
   async executeProcedureReturnsString(name: string, params: any[] | null): Promise<string> {
     try {
-      const scalar = await this.executeProcedure(name, params);
+      const scalar = (await this.executeProcedure(name, params))[0][name];
 
       if (Array.isArray(scalar)) throw new Error('El procedimiento almacenado no devuelve un valor escalar');
 
@@ -116,13 +116,12 @@ export class Conexion {
 
   async executeProcedureReturnsInt(name: string, params: any[] | null): Promise<number> {
     try {
-      const scalar = await this.executeProcedure(name, params);
+      const scalar = (await this.executeProcedure(name, params))[0][name];
 
       if (Array.isArray(scalar)) throw new Error('El procedimiento almacenado no devuelve un valor escalar');
 
       if (typeof scalar !== 'number') throw new Error('El valor que retorna no es de tipo Int');
 
-      console.log(scalar);
       return scalar;
     } catch (error) {
       throw error;
@@ -131,13 +130,12 @@ export class Conexion {
 
   async executeProcedureReturnsBoolean(name: string, params: any[] | null): Promise<boolean> {
     try {
-      const scalar = await this.executeProcedure(name, params);
+      const scalar = (await this.executeProcedure(name, params))[0][name];
 
       if (Array.isArray(scalar)) throw new Error('El procedimiento almacenado no devuelve un valor escalar');
 
       if (typeof scalar !== 'boolean') throw new Error('El valor que retorna no es de tipo Boolean');
 
-      console.log(scalar);
       return scalar;
     } catch (error) {
       throw error;

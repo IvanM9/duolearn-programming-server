@@ -1,5 +1,5 @@
 import { StadisticsService } from "@/services/stadistics.service";
-import { Controller, Get } from "routing-controllers";
+import { Controller, Get, Req, Res } from "routing-controllers";
 import { OpenAPI } from "routing-controllers-openapi";
 import Container from "typedi";
 
@@ -10,7 +10,7 @@ export class StadisticsController {
 
     @Get("/usuario/estadisticas_java/:usuario")
     @OpenAPI({summary:"Obtener las estadísticas del módulo Java de un usuario"})
-    async getJava(req, res) {
+    async getJava(@Req() req, @Res() res) {
         try {
             const usuario = req.params.usuario;
             console.log(usuario);
@@ -27,7 +27,7 @@ export class StadisticsController {
 
     @Get("/usuario/estadisticas_csharp/:usuario")
     @OpenAPI({summary:"Obtener las estadísticas del módulo C# de un usuario"})
-    async getCsharp(req, res) {
+    async getCsharp(@Req() req, @Res() res) {
         try {
 
             const { usuario } = req.params;

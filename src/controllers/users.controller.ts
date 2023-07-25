@@ -1,10 +1,11 @@
-import { Controller, Param, Body, Get, Post, Put, Delete, HttpCode, UseBefore } from 'routing-controllers';
+import { Controller, Param, Body, Get, Post, Put, Delete, HttpCode, UseBefore, Res, Req } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 import { Container } from 'typedi';
 import { CreateUserDto } from '@dtos/users.dto';
 import { User } from '@interfaces/users.interface';
 import { ValidationMiddleware } from '@middlewares/validation.middleware';
 import { UserService } from '@services/users.service';
+import { Response } from 'express';
 const jwt = require('jsonwebtoken');
 
 @Controller()
@@ -15,7 +16,7 @@ export class UserController {
   // const client_secret = "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";
 
   @Get("/admin/usuarios/listar")
-  async listarUsuarios(req, res) {
+  async listarUsuarios(@Req() req, @Res() res) {
     try {
       const datos = await this.user.listarUsuarios();
       res.json(datos);
@@ -27,7 +28,7 @@ export class UserController {
 
   //Se obtiene los datos del usuario 
   @Get("/usuario/datos/:usuario")
-  async getUsuario(req, res) {
+  async getUsuario(@Req() req, @Res() res) {
     try {
       const { usuario } = req.params;
       console.log(usuario);
@@ -53,7 +54,7 @@ export class UserController {
   //se obtienen una verificación de que son correctos
 
   @Post("/iniciar_sesion")
-  async iniciarSesion(req, res) {
+  async iniciarSesion(@Req() req, @Res() res) {
     try {
       const { usuario, clave } = req.body;
       if (usuario.length > 0 && clave.length > 0) {
@@ -75,7 +76,7 @@ export class UserController {
 
   //Se obtienen todos los datos y luego se reemplaza con los valores actuales
   @Get("/usuario/modificar")
-  async modificarUsuario(req, res) {
+  async modificarUsuario(@Req() req, @Res() res) {
     try {
       const { usuario } = req.body;
       if (usuario != null) {
@@ -96,12 +97,16 @@ export class UserController {
 
   //Se registra un nuevo usuario
   @Post("/usuario/nuevo")
-  async nuevoUsuario(req, res) {
+  async nuevoUsuario(@Body() data: CreateUserDto, @Res() res: Response) {
     try {
-      const { usuario, nombres, apellidos, correo, clave, fecha_nacimiento } = req.body;
+      const { usuario, nombres, apellidos, correo, clave, fecha_nacimiento } = data;
       let status = await this.user.registrarUser(usuario, nombres, apellidos, correo, clave, fecha_nacimiento);
-      if (status === 1)
+
+      if (status == 1)
+      {
+        console.log(res);
         res.json({ mensaje: "Registro correcto", estado: "1" });
+      }
       else
         res.json({ mensaje: "Registro fallido", estado: "0" });
     }
@@ -113,7 +118,7 @@ export class UserController {
 
   //Se elimina un usuario
   @Delete("/usuario/eliminar/:usuario")
-  async elimnarUsuario(req, res) {
+  async elimnarUsuario(@Req() req, @Res() res) {
     try {
       const usuario = req.params.usuario;
       if (usuario != null) {
@@ -195,7 +200,7 @@ export class UserController {
 
   // Se ingresa nueva clave y se hace la verificación del token
   @Post("/resetear_clave")
-  async resetearClave(req, res) {
+  async resetearClave(@Req() req, @Res() res) {
     try {
       const { usuario, nueva_clave } = req.body;
       const token = req.headers.reset;
@@ -218,7 +223,7 @@ export class UserController {
 
   //Cambio de clave
   @Post("/cambio_clave")
-  async cambiarClave(req, res) {
+  async cambiarClave(@Req() req, @Res() res) {
     try {
       const { usuario, clave_actual, clave_nueva } = req.body;
       let status = await this.user.cambiarClave(usuario, clave_actual, clave_nueva);
