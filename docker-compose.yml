@@ -16,17 +16,17 @@ services:
     container_name: server
     build:
       context: ./
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     ports:
       - "3000:3000"
     volumes:
       - ./:/app
       - /app/node_modules
-    restart: "unless-stopped"
+    restart: "always"
     networks:
       - backend
     env_file:
-      - .env.development.local
+      - .env.production.local
 
 networks:
   backend:

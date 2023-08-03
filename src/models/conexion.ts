@@ -1,5 +1,6 @@
 import * as url from 'url';
-import { Client, Pool, PoolConfig } from 'pg';
+import { Pool } from 'pg';
+import { DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER } from '@config';
 require('dotenv').config();
 
 export class Conexion {
@@ -16,22 +17,21 @@ export class Conexion {
         host: params.hostname,
         port: params.port,
         database: params.pathname.split('/')[1],
-        
       };
     } else {
       this.config = {
-        user: process.env.DB_USER,
-        host: process.env.DB_HOST,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-        port: '5432',
+        user: DB_USER,
+        host: DB_HOST,
+        password: DB_PASSWORD,
+        database: DB_NAME,
+        port: DB_PORT || '5432',
       };
     }
 
     this.config.ssl = {
       rejectUnauthorized: false,
     };
-    
+
     this.database = new Pool(this.config);
     if (this.database.connect()) console.log('Conexion exitosa');
     else console.log('Conexion fallida');
@@ -110,7 +110,6 @@ export class Conexion {
 
       if (typeof scalar !== 'string') throw new Error('El valor que retorna no es de tipo String');
 
-      console.log(scalar);
       return scalar;
     } catch (error) {
       throw error;

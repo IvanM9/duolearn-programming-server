@@ -1,9 +1,6 @@
-import { Controller, Param, Body, Get, Post, Put, Delete, HttpCode, UseBefore, Res, Req } from 'routing-controllers';
-import { OpenAPI } from 'routing-controllers-openapi';
+import { Controller, Body, Get, Post, Delete, Res, Req, Put } from 'routing-controllers';
 import { Container } from 'typedi';
 import { CreateUserDto } from '@dtos/users.dto';
-import { User } from '@interfaces/users.interface';
-import { ValidationMiddleware } from '@middlewares/validation.middleware';
 import { UserService } from '@services/users.service';
 import { Response } from 'express';
 const jwt = require('jsonwebtoken');
@@ -15,131 +12,104 @@ export class UserController {
   // const client_id = "670624648440-p8o6pnd7pan6cfi8922goq645pr9nnds.apps.googleusercontent.com";
   // const client_secret = "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";
 
-  @Get("/admin/usuarios/listar")
-  async listarUsuarios(@Req() req, @Res() res) {
+  @Get('/admin/usuarios/listar')
+  async listarUsuarios() {
     try {
-      const datos = await this.user.listarUsuarios();
-      return datos;
+      return await this.user.listarUsuarios();
     } catch (error) {
       console.log(error);
       return { estado: 0 };
     }
   }
 
-  //Se obtiene los datos del usuario 
-  @Get("/usuario/datos/:usuario")
-  async getUsuario(@Req() req, @Res() res) {
+  //Se obtiene los datos del usuario
+  @Get('/usuario/datos/:usuario')
+  async getUsuario(@Req() req) {
     try {
       const { usuario } = req.params;
 
       if (usuario != null) {
-        let datos = await this.user.getUser(usuario);
-        console.log(datos)
+        const datos = await this.user.getUser(usuario);
         if (datos != null) {
-          datos.estado = "1";
+          datos.estado = '1';
           return datos;
-        }
-        else
-          return { estado: "0" };
-      }
-      else
-        return { estado: "0" };
-    }
-    catch (error) {
+        } else return { estado: '0' };
+      } else return { estado: '0' };
+    } catch (error) {
       console.error();
       return { estado: 0 };
     }
   }
 
-  //Se verifica que los datos no estén vacios y 
+  //Se verifica que los datos no estén vacios y
   //se obtienen una verificación de que son correctos
 
-  @Post("/iniciar_sesion")
-  async iniciarSesion(@Req() req, @Res() res) {
+  @Post('/iniciar_sesion')
+  async iniciarSesion(@Req() req) {
     try {
       const { usuario, clave } = req.body;
-      
+
       if (usuario.length > 0 && clave.length > 0) {
-        let datos = await this.user.inciarSesion(usuario, clave);
+        const datos = await this.user.inciarSesion(usuario, clave);
         if (datos !== 0 && datos !== null) {
-          return { mensaje: "Sesion iniciada", estado: "1" };
-        }
-        else
-          return { mensaje: "Ingreso fallido", estado: "0" };
-      }
-      else
-        return { mensaje: "campos vacios", estado: "0" };
-    }
-    catch (error) {
+          return { mensaje: 'Sesion iniciada', estado: '1' };
+        } else return { mensaje: 'Ingreso fallido', estado: '0' };
+      } else return { mensaje: 'campos vacios', estado: '0' };
+    } catch (error) {
       console.log(error);
       return { estado: 0 };
     }
   }
 
   //Se obtienen todos los datos y luego se reemplaza con los valores actuales
-  @Get("/usuario/modificar")
-  async modificarUsuario(@Req() req, @Res() res) {
+  @Put('/usuario/modificar')
+  async modificarUsuario(@Req() req) {
     try {
       const { usuario } = req.body;
       if (usuario != null) {
         const { nombres, apellidos, correo, fecha_nacimiento } = req.body;
-        let status = await this.user.modificarUser(usuario, nombres, apellidos, correo, fecha_nacimiento);
+        const status = await this.user.modificarUser(usuario, nombres, apellidos, correo, fecha_nacimiento);
         console.log(status);
-        if (status === 1)
-          return { mensaje: "Modificado con exito", estado: "1" };
-        else
-          return { mensaje: "Modificación fallida ", estado: "0" };
-      }
-      else
-        return { mensaje: "El usuario no ha iniciado la sesión ", estado: "0" };
+        if (status === 1) return { mensaje: 'Modificado con exito', estado: '1' };
+        else return { mensaje: 'Modificación fallida ', estado: '0' };
+      } else return { mensaje: 'El usuario no ha iniciado la sesión ', estado: '0' };
     } catch (error) {
-      return { mensaje: "Error: " + error, estado: "0" };
+      return { mensaje: 'Error: ' + error, estado: '0' };
     }
   }
 
   //Se registra un nuevo usuario
-  @Post("/usuario/nuevo")
+  @Post('/usuario/nuevo')
   async nuevoUsuario(@Body() data: CreateUserDto, @Res() res: Response) {
     try {
       const { usuario, nombres, apellidos, correo, clave, fecha_nacimiento } = data;
-      let status = await this.user.registrarUser(usuario, nombres, apellidos, correo, clave, fecha_nacimiento);
+      const status = await this.user.registrarUser(usuario, nombres, apellidos, correo, clave, fecha_nacimiento);
 
-      if (status == 1)
-      {
-        console.log(res);
-        return { mensaje: "Registro correcto", estado: "1" };
-      }
-      else
-        return { mensaje: "Registro fallido", estado: "0" };
-    }
-    catch (error) {
+      if (status == 1) {
+        return { mensaje: 'Registro correcto', estado: '1' };
+      } else return { mensaje: 'Registro fallido', estado: '0' };
+    } catch (error) {
       console.log(error);
       return { estado: 0 };
     }
   }
 
   //Se elimina un usuario
-  @Delete("/usuario/eliminar/:usuario")
+  @Delete('/usuario/eliminar/:usuario')
   async elimnarUsuario(@Req() req, @Res() res) {
     try {
       const usuario = req.params.usuario;
       if (usuario != null) {
-        let status = await this.user.eliminarUser(usuario);
+        const status = await this.user.eliminarUser(usuario);
         if (status === 1) {
-          return { mensaje: "Eliminado con éxito ", estado: "1" };
-        }
-        else
-          return { mensaje: "Eliminación fallido ", estado: "0" };
-
-      }
-      else
-        res.json({ mensaje: "El sesión no está iniciada", estado: "0" });
+          return { mensaje: 'Eliminado con éxito ', estado: '1' };
+        } else return { mensaje: 'Eliminación fallido ', estado: '0' };
+      } else res.json({ mensaje: 'El sesión no está iniciada', estado: '0' });
     } catch (error) {
       console.log(error);
       res.json({ estado: 0 });
     }
   }
-
 
   //Se envía un correo con una token temporal
   //  solicitarClave = async (req, res) => {
@@ -188,7 +158,7 @@ export class UserController {
   //   }
   // }
 
-  // Se genera un nuevo token para el cambio de contraseña 
+  // Se genera un nuevo token para el cambio de contraseña
   //  private crearToken = async (usuario) => {
   //   try {
   //       let resetToken = jwt.sign({ username: usuario }, "studentreset", { expiresIn: '10m' });
@@ -201,44 +171,35 @@ export class UserController {
   // }
 
   // Se ingresa nueva clave y se hace la verificación del token
-  @Post("/resetear_clave")
+  @Post('/resetear_clave')
   async resetearClave(@Req() req, @Res() res) {
     try {
       const { usuario, nueva_clave } = req.body;
       const token = req.headers.reset;
 
-      jwt.verify(token, "studentreset", async (err, decoded) => {
+      jwt.verify(token, 'studentreset', async () => {
         await this.user.asignarToken(usuario, null);
-
       });
-      let status = await this.user.resetClave(usuario, nueva_clave, token);
-      if (status != null && status != 0)
-        return { mensaje: "clave cambiada exitosamente", estado: 1 };
-      else
-        return { estado: "0" };
-
+      const status = await this.user.resetClave(usuario, nueva_clave, token);
+      if (status != null && status != 0) return { mensaje: 'clave cambiada exitosamente', estado: 1 };
+      else return { estado: '0' };
     } catch (error) {
       console.log(error);
-      res.json({ estado: "0", error });
+      res.json({ estado: '0', error });
     }
   }
 
   //Cambio de clave
-  @Post("/cambio_clave")
-  async cambiarClave(@Req() req, @Res() res) {
+  @Post('/cambio_clave')
+  async cambiarClave(@Req() req) {
     try {
       const { usuario, clave_actual, clave_nueva } = req.body;
-      let status = await this.user.cambiarClave(usuario, clave_actual, clave_nueva);
-      if (status === 1)
-        return { estado: "1" };
-      else
-        return { estado: "0" };
-    }
-    catch (error) {
+      const status = await this.user.cambiarClave(usuario, clave_actual, clave_nueva);
+      if (status === 1) return { estado: '1' };
+      else return { estado: '0' };
+    } catch (error) {
       console.log(error);
-      return { estado: "0" };
+      return { estado: '0' };
     }
   }
-
-
 }
