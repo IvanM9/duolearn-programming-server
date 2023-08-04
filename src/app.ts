@@ -48,9 +48,9 @@ export class App {
   storage = multer.diskStorage({
     destination: path.join(__dirname, 'public/uploads'),
     filename: (req, files, cb) => {
-        cb(null, files.originalname);
-    }
-})
+      cb(null, files.originalname);
+    },
+  });
 
   private initializeMiddlewares() {
     this.app.use(morgan(LOG_FORMAT, { stream }));
@@ -60,7 +60,7 @@ export class App {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
-    this.app.use(multer({storage: this.storage}).array('images'));
+    this.app.use(multer({ storage: this.storage }).array('images'));
   }
 
   private initializeRoutes(controllers: Function[]) {

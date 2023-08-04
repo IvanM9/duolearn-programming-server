@@ -1,30 +1,23 @@
-import { IsEmail, IsString, IsNotEmpty, MinLength, MaxLength } from 'class-validator';
-import { OpenAPI } from 'routing-controllers-openapi';
+import { IsString, IsEmail, Length, IsDateString, IsOptional } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
   public usuario: string;
-  
+
   @IsString()
   public nombres: string;
 
   @IsString()
   public apellidos: string;
 
-  @IsString()
+  @IsEmail()
   public correo: string;
 
   @IsString()
+  @Length(6)
   public clave: string;
 
-  @IsString()
+  @IsDateString()
+  @IsOptional()
   public fecha_nacimiento: string;
-}
-
-export class UpdateUserDto {
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(9)
-  @MaxLength(32)
-  public password: string;
 }

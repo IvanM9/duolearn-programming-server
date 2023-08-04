@@ -2,7 +2,8 @@ import { Controller, Body, Get, Post, Delete, Res, Req, Put } from 'routing-cont
 import { Container } from 'typedi';
 import { CreateUserDto } from '@dtos/users.dto';
 import { UserService } from '@services/users.service';
-import { Response } from 'express';
+import { Request, Response } from 'express';
+import { LoginDto } from '@dtos/auth.dto';
 const jwt = require('jsonwebtoken');
 
 @Controller()
@@ -24,7 +25,7 @@ export class UserController {
 
   //Se obtiene los datos del usuario
   @Get('/usuario/datos/:usuario')
-  async getUsuario(@Req() req) {
+  async getUsuario(@Req() req: Request) {
     try {
       const { usuario } = req.params;
 
@@ -45,9 +46,9 @@ export class UserController {
   //se obtienen una verificación de que son correctos
 
   @Post('/iniciar_sesion')
-  async iniciarSesion(@Req() req) {
+  async iniciarSesion(@Body() data: LoginDto) {
     try {
-      const { usuario, clave } = req.body;
+      const { usuario, clave } = data;
 
       if (usuario.length > 0 && clave.length > 0) {
         const datos = await this.user.inciarSesion(usuario, clave);
@@ -63,7 +64,7 @@ export class UserController {
 
   //Se obtienen todos los datos y luego se reemplaza con los valores actuales
   @Put('/usuario/modificar')
-  async modificarUsuario(@Req() req) {
+  async modificarUsuario(@Req() req: Request) {
     try {
       const { usuario } = req.body;
       if (usuario != null) {
@@ -80,7 +81,7 @@ export class UserController {
 
   //Se registra un nuevo usuario
   @Post('/usuario/nuevo')
-  async nuevoUsuario(@Body() data: CreateUserDto, @Res() res: Response) {
+  async nuevoUsuario(@Body() data: CreateUserDto) {
     try {
       const { usuario, nombres, apellidos, correo, clave, fecha_nacimiento } = data;
       const status = await this.user.registrarUser(usuario, nombres, apellidos, correo, clave, fecha_nacimiento);
@@ -96,7 +97,7 @@ export class UserController {
 
   //Se elimina un usuario
   @Delete('/usuario/eliminar/:usuario')
-  async elimnarUsuario(@Req() req, @Res() res) {
+  async elimnarUsuario(@Req() req: Request, @Res() res: Response) {
     try {
       const usuario = req.params.usuario;
       if (usuario != null) {
@@ -172,7 +173,7 @@ export class UserController {
 
   // Se ingresa nueva clave y se hace la verificación del token
   @Post('/resetear_clave')
-  async resetearClave(@Req() req, @Res() res) {
+  async resetearClave(@Req() req: Request, @Res() res: Response) {
     try {
       const { usuario, nueva_clave } = req.body;
       const token = req.headers.reset;
