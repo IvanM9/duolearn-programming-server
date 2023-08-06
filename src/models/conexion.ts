@@ -1,5 +1,5 @@
 import * as url from 'url';
-import { Pool } from 'pg';
+import { Client, Pool, PoolClient } from 'pg';
 import { DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER } from '@config';
 require('dotenv').config();
 
@@ -33,34 +33,23 @@ export class Conexion {
     };
 
     this.database = new Pool(this.config);
-    if (this.database.connect()) console.log('Conexion exitosa');
-    else console.log('Conexion fallida');
+
   }
 
-  private desconect() {
-    this.database.end();
+  private async desconect(connect: PoolClient) {
+    connect.release();
   }
 
-  private connect() {
-    this.database.connect();
+  private async connect() {
+    return await this.database.connect();
   }
 
   private async queryWithValues(query: string, params: any[]): Promise<any> {
-    this.connect();
-    const data = await this.database.query(query, params);
-    // this.desconect();
-
-    return data;
+    return this.database.query(query, params);
   }
 
   private async query(query: string) {
-    this.connect();
-
-    const data = await this.database.query(query);
-
-    //this.desconect();
-
-    return data;
+    return await this.database.query(query);
   }
 
   private async executeProcedure(name: string, params: any[] | null): Promise<any> {
