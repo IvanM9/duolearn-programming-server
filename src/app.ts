@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import { defaultMetadataStorage } from 'class-transformer/cjs/storage';
-import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
+// import { defaultMetadataStorage } from 'class-transformer/cjs/storage';
+// import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import express from 'express';
@@ -75,10 +75,10 @@ export class App {
   }
 
   private initializeSwagger(controllers: Function[]) {
-    const schemas = validationMetadatasToSchemas({
-      classTransformerMetadataStorage: defaultMetadataStorage,
-      refPointerPrefix: '#/components/schemas/',
-    });
+    // const schemas = validationMetadatasToSchemas({
+    //   classTransformerMetadataStorage: defaultMetadataStorage,
+    //   refPointerPrefix: '#/components/schemas/',
+    // });
 
     const routingControllersOptions = {
       controllers: controllers,
@@ -96,8 +96,8 @@ export class App {
         },
       },
       info: {
-        description: 'Generated with `routing-controllers-openapi`',
-        title: 'A sample API',
+        description: 'Documentación de la API de Duolearn Programming',
+        title: 'Duolearn Programming',
         version: '1.0.0',
       },
     });

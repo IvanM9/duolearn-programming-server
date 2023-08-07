@@ -1,11 +1,12 @@
 import * as url from 'url';
-import { Client, Pool, PoolClient } from 'pg';
+import { Pool, PoolClient } from 'pg';
 import { DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER } from '@config';
 require('dotenv').config();
 
 export class Conexion {
   private readonly database: Pool;
   private config: any;
+
   constructor() {
     if (process.env.DATABASE_URL) {
       const params = url.parse(process.env.DATABASE_URL);
@@ -33,7 +34,6 @@ export class Conexion {
     };
 
     this.database = new Pool(this.config);
-
   }
 
   private async desconect(connect: PoolClient) {
