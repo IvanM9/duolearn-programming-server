@@ -1,6 +1,6 @@
 import { Controller, Body, Get, Post, Delete, Res, Req, Put, Param } from 'routing-controllers';
 import { Container } from 'typedi';
-import { CreateUserDto, UpdateUserDto } from '@dtos/users.dto';
+import { ChangePasswordDto, CreateUserDto, ResetPasswordDto, UpdateUserDto } from '@dtos/users.dto';
 import { UserService } from '@services/users.service';
 import { Request, Response } from 'express';
 import { LoginDto } from '@dtos/auth.dto';
@@ -25,16 +25,12 @@ export class UserController {
 
   //Se obtiene los datos del usuario
   @Get('/usuario/datos/:usuario')
-  async getUsuario(@Req() req: Request) {
+  async getUsuario(@Param('usuario') usuario: string) {
     try {
-      const { usuario } = req.params;
-
-      if (usuario != null) {
-        const datos = await this.user.getUser(usuario);
-        if (datos != null) {
-          datos.estado = '1';
-          return datos;
-        } else return { estado: '0' };
+      const datos = await this.user.getUser(usuario);
+      if (datos != null) {
+        datos.estado = '1';
+        return datos;
       } else return { estado: '0' };
     } catch (error) {
       console.error();
@@ -172,15 +168,15 @@ export class UserController {
 
   // Se ingresa nueva clave y se hace la verificación del token
   @Post('/resetear_clave')
-  async resetearClave(@Req() req: Request, @Res() res: Response) {
+  async resetearClave(@Req() req: Request, @Res() res: Response, @Body() body: ResetPasswordDto) {
     try {
-      const { usuario, nueva_clave } = req.body;
       const token = req.headers.reset;
 
       jwt.verify(token, 'studentreset', async () => {
-        await this.user.asignarToken(usuario, null);
+        await this.user.asignarToken(body.usuario, null);
       });
-      const status = await this.user.resetClave(usuario, nueva_clave, token);
+
+      const status = await this.user.resetClave(body.usuario, body.nueva_clave, token);
       if (status != null && status != 0) return { mensaje: 'clave cambiada exitosamente', estado: 1 };
       else return { estado: '0' };
     } catch (error) {
@@ -191,10 +187,9 @@ export class UserController {
 
   //Cambio de clave
   @Post('/cambio_clave')
-  async cambiarClave(@Req() req) {
+  async cambiarClave(@Body() body: ChangePasswordDto) {
     try {
-      const { usuario, clave_actual, clave_nueva } = req.body;
-      const status = await this.user.cambiarClave(usuario, clave_actual, clave_nueva);
+      const status = await this.user.cambiarClave(body.usuario, body.clave_actual, body.clave_nueva);
       if (status === 1) return { estado: '1' };
       else return { estado: '0' };
     } catch (error) {

@@ -43,3 +43,34 @@ export class UpdateUserDto {
   @IsOptional()
   public fecha_nacimiento: string;
 }
+
+export class ResetPasswordDto {
+  @IsString()
+  public usuario: string;
+
+  @IsStrongPassword({
+    minLength: 6,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 0,
+  })
+  public nueva_clave: string;
+}
+
+export class ChangePasswordDto {
+  @IsString()
+  public usuario: string;
+
+  @IsStrongPassword({
+    minLength: 6,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 0,
+  })
+  public clave_nueva: string;
+
+  @IsString()
+  public clave_actual: string;
+}
