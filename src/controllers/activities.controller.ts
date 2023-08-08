@@ -3,7 +3,15 @@ import { ActivitiesService } from '@/services/activities.service';
 import { Body, Controller, Delete, Get, Param, Post, Put, Req } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 import Container from 'typedi';
-import { GetActivitiesDto, GetTopicsDto, NewActivityDto, ResolveActivitiesDto, UpdateActivityDto } from '@dtos/activities.dto';
+import {
+  GetActivitiesDto,
+  GetTopicsDto,
+  NewActivityDto,
+  NewTopicDto,
+  ResolveActivitiesDto,
+  UpdateActivityDto,
+  UpdateTopicDto,
+} from '@dtos/activities.dto';
 
 @Controller()
 export class ActivitiesController {
@@ -105,10 +113,9 @@ export class ActivitiesController {
   @OpenAPI({
     summary: 'Se inserta un nuevo tema ',
   })
-  async agregarTema(@Req() req) {
+  async agregarTema(@Body() body: NewTopicDto) {
     try {
-      const { modulo, lenguaje, titulo, concepto } = req.body;
-      const status = await this.activity.añadirTema(modulo, lenguaje, titulo, concepto);
+      const status = await this.activity.añadirTema(body.modulo, body.lenguaje, body.titulo, body.concepto);
       if (status != null) return { estado: status };
       else return { estado: 0 };
     } catch (error) {
@@ -122,10 +129,9 @@ export class ActivitiesController {
   @OpenAPI({
     summary: 'Se modifica un tema',
   })
-  async modificarTema(@Req() req) {
+  async modificarTema(@Body() body: UpdateTopicDto) {
     try {
-      const { id, modulo, lenguaje, titulo, concepto } = req.body;
-      const status = await this.activity.modificarTema(id, modulo, lenguaje, titulo, concepto);
+      const status = await this.activity.modificarTema(body.id, body.modulo, body.lenguaje, body.titulo, body.concepto);
       return { estado: status };
     } catch (error) {
       return { estado: '0' };

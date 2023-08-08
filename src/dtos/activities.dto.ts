@@ -77,3 +77,22 @@ export class UpdateActivityDto extends NewActivityDto {
   @IsNumber()
   public id: number;
 }
+
+export class NewTopicDto {
+  @IsNumber()
+  public modulo: number;
+
+  @IsString()
+  public lenguaje: string;
+
+  @IsString()
+  public titulo: string;
+
+  @IsString()
+  public concepto: string;
+}
+
+export class UpdateTopicDto extends NewTopicDto {
+  @IsNumber()
+  public id: number;
+}
