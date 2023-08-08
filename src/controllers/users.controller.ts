@@ -1,6 +1,6 @@
-import { Controller, Body, Get, Post, Delete, Res, Req, Put } from 'routing-controllers';
+import { Controller, Body, Get, Post, Delete, Res, Req, Put, Param } from 'routing-controllers';
 import { Container } from 'typedi';
-import { CreateUserDto } from '@dtos/users.dto';
+import { CreateUserDto, UpdateUserDto } from '@dtos/users.dto';
 import { UserService } from '@services/users.service';
 import { Request, Response } from 'express';
 import { LoginDto } from '@dtos/auth.dto';
@@ -64,11 +64,11 @@ export class UserController {
 
   //Se obtienen todos los datos y luego se reemplaza con los valores actuales
   @Put('/usuario/modificar')
-  async modificarUsuario(@Req() req: Request) {
+  async modificarUsuario(@Body() data: UpdateUserDto) {
     try {
-      const { usuario } = req.body;
+      const { usuario } = data;
       if (usuario != null) {
-        const { nombres, apellidos, correo, fecha_nacimiento } = req.body;
+        const { nombres, apellidos, correo, fecha_nacimiento } = data;
         const status = await this.user.modificarUser(usuario, nombres, apellidos, correo, fecha_nacimiento);
         console.log(status);
         if (status === 1) return { mensaje: 'Modificado con exito', estado: '1' };
@@ -97,9 +97,8 @@ export class UserController {
 
   //Se elimina un usuario
   @Delete('/usuario/eliminar/:usuario')
-  async elimnarUsuario(@Req() req: Request, @Res() res: Response) {
+  async elimnarUsuario(@Param('usuario') usuario: string, @Res() res: Response) {
     try {
-      const usuario = req.params.usuario;
       if (usuario != null) {
         const status = await this.user.eliminarUser(usuario);
         if (status === 1) {

@@ -10,12 +10,7 @@ export class UserService {
 
   listarUsuarios = async () => {
     try {
-      const aux = [];
-      const datos = await this.conexion.executeProcedureReturnsTable('listar_usuarios');
-      datos.rows.forEach(element => {
-        aux.push(element.listar_usuarios);
-      });
-      return aux;
+      return await this.conexion.executeProcedureReturnsTable('listar_usuarios');
     } catch (error) {
       console.log(error);
       return null;

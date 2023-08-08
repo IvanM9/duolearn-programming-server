@@ -21,3 +21,21 @@ export class CreateUserDto {
   @IsOptional()
   public fecha_nacimiento: string;
 }
+
+export class UpdateUserDto {
+  @IsString()
+  public usuario: string;
+
+  @IsString()
+  public nombres: string;
+
+  @IsString()
+  public apellidos: string;
+
+  @IsEmail()
+  public correo: string;
+
+  @IsDateString()
+  @IsOptional()
+  public fecha_nacimiento: string;
+}
