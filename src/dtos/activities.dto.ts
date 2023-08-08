@@ -14,6 +14,14 @@ export class GetActivitiesDto {
   public usuario: string;
 }
 
+export class GetTopicsDto {
+  @IsNumber()
+  public modulo: number;
+
+  @IsString()
+  public lenguaje: string;
+}
+
 export class ResolveActivitiesDto {
   @IsString()
   public usuario: string;
@@ -63,4 +71,9 @@ export class NewActivityDto {
 
   @IsString()
   public tipo: string;
+}
+
+export class UpdateActivityDto extends NewActivityDto {
+  @IsNumber()
+  public id: number;
 }

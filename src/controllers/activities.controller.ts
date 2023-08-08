@@ -3,7 +3,7 @@ import { ActivitiesService } from '@/services/activities.service';
 import { Body, Controller, Delete, Get, Param, Post, Put, Req } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 import Container from 'typedi';
-import { GetActivitiesDto, NewActivityDto, ResolveActivitiesDto } from '@dtos/activities.dto';
+import { GetActivitiesDto, GetTopicsDto, NewActivityDto, ResolveActivitiesDto, UpdateActivityDto } from '@dtos/activities.dto';
 
 @Controller()
 export class ActivitiesController {
@@ -137,9 +137,9 @@ export class ActivitiesController {
   @OpenAPI({
     summary: 'Se modifica una actividad',
   })
-  async modificarActividad(@Req() req) {
+  async modificarActividad(@Body() body: UpdateActivityDto) {
     try {
-      const { id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo } = req.body;
+      const { id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo } = body;
       const status = await this.activity.modificarActividad(id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo);
       return { estado: status };
     } catch (error) {
@@ -180,10 +180,9 @@ export class ActivitiesController {
   @OpenAPI({
     summary: 'Se obtiene una la teoría correspondiente al módulo y al lenguaje',
   })
-  async obtenerTemas(@Req() req) {
+  async obtenerTemas(@Body() body: GetTopicsDto) {
     try {
-      const { modulo, lenguaje } = req.body;
-      const datos = await this.activity.obtenerTemas(modulo, lenguaje);
+      const datos = await this.activity.obtenerTemas(body.modulo, body.lenguaje);
       if (datos != null) {
         return datos;
       } else return { estado: 0 };
