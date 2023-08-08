@@ -1,4 +1,4 @@
-import { IsString, IsEmail, Length, IsDateString, IsOptional } from 'class-validator';
+import { IsString, IsEmail, IsDateString, IsOptional, IsStrongPassword } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -13,13 +13,17 @@ export class CreateUserDto {
   @IsEmail()
   public correo: string;
 
-  @IsString()
-  @Length(6)
+  @IsStrongPassword({
+    minLength: 6,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 0,
+  })
   public clave: string;
 
-  @IsDateString()
-  @IsOptional()
-  public fecha_nacimiento: string;
+  @IsDateString({ strict: false })
+  public fecha_nacimiento: Date;
 }
 
 export class UpdateUserDto {

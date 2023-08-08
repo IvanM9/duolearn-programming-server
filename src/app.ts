@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-// import { defaultMetadataStorage } from 'class-transformer/cjs/storage';
-// import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
+import { defaultMetadataStorage } from 'class-transformer/cjs/storage';
+import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import express from 'express';
@@ -75,10 +75,10 @@ export class App {
   }
 
   private initializeSwagger(controllers: Function[]) {
-    // const schemas = validationMetadatasToSchemas({
-    //   classTransformerMetadataStorage: defaultMetadataStorage,
-    //   refPointerPrefix: '#/components/schemas/',
-    // });
+    const schemas = validationMetadatasToSchemas({
+      classTransformerMetadataStorage: defaultMetadataStorage,
+      refPointerPrefix: '#/components/schemas/',
+    });
 
     const routingControllersOptions = {
       controllers: controllers,
@@ -87,7 +87,7 @@ export class App {
     const storage = getMetadataArgsStorage();
     const spec = routingControllersToSpec(storage, routingControllersOptions, {
       components: {
-        schemas: null,
+        schemas,
         securitySchemes: {
           basicAuth: {
             scheme: 'basic',

@@ -1,8 +1,9 @@
 import { API_KEY, API_SECRET, CLOUD_NAME } from '@/config';
 import { ActivitiesService } from '@/services/activities.service';
-import { Controller, Delete, Get, Post, Put, Req } from 'routing-controllers';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 import Container from 'typedi';
+import { GetActivitiesDto, NewActivityDto, ResolveActivitiesDto } from '@dtos/activities.dto';
 
 @Controller()
 export class ActivitiesController {
@@ -24,10 +25,9 @@ export class ActivitiesController {
   @OpenAPI({
     summary: 'Se obtiene las actividades por medio de varios restricciones',
   })
-  async obtenerActividades(@Req() req) {
+  async obtenerActividades(@Body() body: GetActivitiesDto) {
     try {
-      const { modulo, lenguaje, tipo, usuario } = req.body;
-      const datos = await this.activity.obtenerActividades(modulo, lenguaje, tipo, usuario);
+      const datos = await this.activity.obtenerActividades(body.modulo, body.lenguaje, body.tipo, body.usuario);
       if (datos != null) {
         return datos;
       } else return { mensaje: 'vacio', estado: '0' };
@@ -42,13 +42,18 @@ export class ActivitiesController {
   @OpenAPI({
     summary: 'Se envían los datos para registrar la actividad y su nota correspondiente',
   })
-  async resolverActividad(@Req() req) {
+  async resolverActividad(@Body() body: ResolveActivitiesDto) {
     try {
-      const { usuario, id_actividad, fecha, minutos, intentos, num_actividad, puntaje } = req.body;
-      if (usuario != null) {
-        const datos = await this.activity.resolverActividad(usuario, id_actividad, fecha, minutos, intentos, num_actividad, puntaje);
-        return { estado: datos };
-      } else return { mensaje: 'Usuario desconectado', estado: '0' };
+      const isSaved = await this.activity.resolverActividad(
+        body.usuario,
+        body.id_actividad,
+        body.fecha,
+        body.minutos,
+        body.intentos,
+        body.num_actividad,
+        body.puntaje,
+      );
+      return { estado: isSaved };
     } catch (error) {
       console.log(error);
       return { estado: '0' };
@@ -60,9 +65,9 @@ export class ActivitiesController {
   @OpenAPI({
     summary: 'Se inserta una nueva actividad a la base de datos',
   })
-  async agregarActividad(@Req() req) {
+  async agregarActividad(@Body() body: NewActivityDto, @Req() req) {
     try {
-      const { tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo } = req.body;
+      const { tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo } = body;
       let status, _pregunta, _opcion1;
       switch (tipo) {
         case 'encontrar-error':
@@ -147,9 +152,8 @@ export class ActivitiesController {
   @OpenAPI({
     summary: 'Se elimina una actividad',
   })
-  async eliminarActividad(@Req() req) {
+  async eliminarActividad(@Param('id') id: number) {
     try {
-      const { id } = req.params;
       const status = await this.activity.eliminarActividad(id);
       return { estado: status };
     } catch (error) {
@@ -162,9 +166,8 @@ export class ActivitiesController {
   @OpenAPI({
     summary: 'Se elimina un tema',
   })
-  async eliminarTema(@Req() req) {
+  async eliminarTema(@Param('id') id: number) {
     try {
-      const { id } = req.params;
       const status = await this.activity.eliminarTema(id);
       return { estado: status };
     } catch (error) {
