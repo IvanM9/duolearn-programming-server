@@ -17,6 +17,24 @@ export class ActivitiesService {
     }
   };
 
+  //Se llama a la función para obtener las actividades
+  obtenerActividadesAll = async () => {
+    try {
+      return await this.conexion.executeProcedureReturnsTable('obtener_actividades_all');
+    } catch (error) {
+      return null;
+    }
+  };
+
+  //Se llama a la función para obtener una actividad por id
+  obtenerActividadId = async (id:any) => {
+    try {
+      return await this.conexion.executeProcedureReturnsTable('obtener_actividad_id',[id]);
+    } catch (error) {
+      return null;
+    }
+  };
+
   //Se envian los datos de la actividad a la base de datos
   resolverActividad = async (usuario, id_actividad, fecha, minutos, intentos, num_actividad, puntaje) => {
     try {

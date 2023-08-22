@@ -45,6 +45,41 @@ export class ActivitiesController {
     }
   }
 
+
+  //Se obtiene las actividades por medio de varios restricciones
+  @Get('/actividades/obtener')
+  @OpenAPI({
+    summary: 'Se obtienem todas las actividades',
+  })
+  async obtenerActividadesAll() {
+    try {
+      const datos = await this.activity.obtenerActividadesAll();
+      if (datos != null) {
+        return datos;
+      } else return { mensaje: 'vacio', estado: '0' };
+    } catch (error) {
+      console.log(error);
+      return { mensaje: 'vacio', estado: '0' };
+    }
+  }
+
+
+  //Se obtiene las actividades por medio de varios restricciones
+  @Get('/actividades/obtener/:id')
+  @OpenAPI({
+    summary: 'Se obtiene una actividad por id',
+  })
+  async obtenerActividadId(@Param('id') id: number) {
+    try {
+      const datos = await this.activity.obtenerActividadId(id);
+      if (datos != null) {
+        return datos;
+      } else return { mensaje: 'vacio', estado: '0' };
+    } catch (error) {
+      console.log(error);
+      return { mensaje: 'vacio', estado: '0' };
+    }
+  }
   // Se envían los datos para registrar la actividad y su nota correspondiente
   @Post('/actividades/resolver')
   @OpenAPI({
@@ -143,10 +178,43 @@ export class ActivitiesController {
   @OpenAPI({
     summary: 'Se modifica una actividad',
   })
-  async modificarActividad(@Body() body: UpdateActivityDto) {
+  async modificarActividad(@Body() body: UpdateActivityDto, @Req() req) {
     try {
       const { id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo } = body;
-      const status = await this.activity.modificarActividad(id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo);
+      let status, _pregunta, _opcion1;
+      switch (tipo) {
+        case 'encontrar-error':
+          if(req.files.length != 0){
+            _pregunta = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
+          }
+          else{
+            _pregunta = pregunta
+          }
+          _opcion1 = opcion_correcta;
+          break;
+        case 'pares':
+          if(req.files.length != 0){
+            _pregunta = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
+            _opcion1 = (await this.cloudinary.v2.uploader.upload(req.files[1].path)).secure_url.trim();
+          }
+          else{
+            _pregunta = pregunta
+            _opcion1 = opcion_correcta;
+          }
+          break;
+        default:
+          _pregunta = pregunta;
+          _opcion1 = opcion_correcta;
+          break;
+      }
+      status = await this.activity.modificarActividad(id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo);
+
+      if (req.files != undefined) {
+        for (const element of req.files) {
+          await this.fs.unlink(element.path);
+        }
+      }
+
       return { estado: status };
     } catch (error) {
       return { estado: '0' };

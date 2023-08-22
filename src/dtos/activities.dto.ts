@@ -75,7 +75,7 @@ export class NewActivityDto {
 
 export class UpdateActivityDto extends NewActivityDto {
   @IsNumber()
-  public id: number;
+  public id: number;  
 }
 
 export class NewTopicDto {
