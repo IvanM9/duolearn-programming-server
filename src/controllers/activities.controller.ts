@@ -128,7 +128,7 @@ export class ActivitiesController {
           break;
       }
 
-      await this.activity.añadirActividad(tema, _pregunta, _opcion1, opcion2, opcion3, opcion4, tipo);
+      status = await this.activity.añadirActividad(tema, _pregunta, _opcion1, opcion2, opcion3, opcion4, tipo);
 
       if (req.files != undefined) {
         for (const element of req.files) {
