@@ -46,7 +46,7 @@ export class ResolveActivitiesDto {
 }
 
 export class NewActivityDto {
-  @IsNumber()
+  @IsNumberString()
   public tema: number;
 
   @IsString()
@@ -74,7 +74,7 @@ export class NewActivityDto {
 }
 
 export class UpdateActivityDto extends NewActivityDto {
-  @IsNumber()
+  @IsNumberString()
   public id: number;  
 }
 
