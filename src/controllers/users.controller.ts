@@ -25,13 +25,13 @@ export class UserController {
 
   //Se obtiene los datos del usuario
   @Get('/usuario/datos/:id')
-  async getUsuario(@Param('id') usuario: string) {
+  async getUsuario(@Param('id') id:number) {
     try {
-      const datos = await this.user.getUser(usuario);
+      const datos = await this.user.getUser(id);
       if (datos != null) {
-        datos.estado = '1';
+        datos.estado = 1;
         return datos;
-      } else return { estado: '0' };
+      } else return { estado: 0 };
     } catch (error) {
       console.error();
       return { estado: 0 };
@@ -49,7 +49,7 @@ export class UserController {
       if (usuario.length > 0 && clave.length > 0) {
         const datos = await this.user.inciarSesion(usuario, clave);
         if (datos !== 0 && datos !== null) {
-          return { mensaje: 'Sesion iniciada', estado: '1' };
+          return { mensaje: 'Sesion iniciada', estado: '1', data: datos };
         } else return { mensaje: 'Ingreso fallido', estado: '0' };
       } else return { mensaje: 'campos vacios', estado: '0' };
     } catch (error) {

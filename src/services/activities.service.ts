@@ -149,6 +149,24 @@ export class ActivitiesService {
     }
   };
 
+  // Se obtiene todos los lenguajes desde la base de datos
+  listarLenguajes = async () => {
+    try {
+      return await this.conexion.executeProcedureReturnsTable('listar_lenguajes', null);
+    } catch (error) {
+      return null;
+    }
+  };
+
+    // Se obtiene todos los lenguajes desde la base de datos
+    obtenerLenguajePorId = async (id) => {
+      try {
+        return await this.conexion.executeProcedureReturnsTable('obtener_lenguaje_por_id', [id]);
+      } catch (error) {
+        return null;
+      }
+    };
+
   cambiarEstadoActividad = async (id, estado) => {
     try {
       return await this.conexion.executeProcedureReturnsInt('cambiar_estado_actividad', [id, estado]);
