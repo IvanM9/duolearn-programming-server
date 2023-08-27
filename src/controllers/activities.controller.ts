@@ -189,28 +189,6 @@ export class ActivitiesController {
     }
   }
 
-  // Se inserta un nuevo tema
-  @Post('/admin/modulo/agregar')
-  @OpenAPI({
-    summary: 'Se inserta un nuevo modulo ',
-  })
-  async agregarModulo(@Body() body: NewTopicDto, @Req() req) {
-    try {
-      let icono;
-      if (req.files.length != 0) {
-        icono = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
-      } else {
-        icono = '';
-      }
-      const status = await this.activity.añadirModulo(body.lenguajeId, body.titulo, body.concepto, icono);
-      if (status != null) return { estado: status };
-      else return { estado: 0 };
-    } catch (error) {
-      console.log(error);
-      return { estado: 0 };
-    }
-  }
-
   // Se modifica un tema
   @Put('/admin/modulo/modificar/:id')
   @OpenAPI({
@@ -241,7 +219,7 @@ export class ActivitiesController {
       const { id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo } = body;
       let _pregunta, _opcion1;
       switch (tipo) {
-        case 'encontrar-error':
+        case ActivityType.BUGS:
           if (req.files.length != 0) {
             _pregunta = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
           } else {
@@ -249,7 +227,7 @@ export class ActivitiesController {
           }
           _opcion1 = opcion_correcta;
           break;
-        case 'pares':
+        case ActivityType.PAIR:
           if (req.files.length != 0) {
             _pregunta = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
             _opcion1 = (await this.cloudinary.v2.uploader.upload(req.files[1].path)).secure_url.trim();
@@ -434,6 +412,28 @@ export class ActivitiesController {
       const status = await this.activity.cambiarEstadoLenguaje(id, estado);
       return { estado: status };
     } catch (error) {
+      return { estado: '0' };
+    }
+  }
+
+  @Post('/admin/modulo/agregar/:lenguajeId')
+  @OpenAPI({ summary: 'Se agrega un nuevo módulo' })
+  async agregarModulo(@Body() body: NewTopicDto, @Param('lenguajeId') lenguajeId: number, @Req() req) {
+    try {
+      const { titulo, concepto } = body;
+      let icono;
+      if (req.files.length != 0) {
+        icono = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
+      } else {
+        icono = '';
+      }
+      const status = await this.activity.agregarModulo(lenguajeId, titulo, concepto, icono);
+
+      await this.deleteLocalFiles(req.files);
+
+      return { estado: status };
+    } catch (error) {
+      console.log(error);
       return { estado: '0' };
     }
   }
