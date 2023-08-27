@@ -35,6 +35,15 @@ export class ActivitiesService {
     }
   };
 
+    //Se llama a la función para obtener una actividad por id
+    obtenerActividadesNoResueltas = async (usuarioId: any, moduloId: any, tipoPregunta: any) => {
+      try {
+        return await this.conexion.executeProcedureReturnsTable('obtener_actividades_no_resueltas', [usuarioId, moduloId, tipoPregunta]);
+      } catch (error) {
+        return null;
+      }
+    };
+
   //Se envian los datos de la actividad a la base de datos
   resolverActividad = async (usuario, id_actividad, minutos, intentos, num_actividad, puntaje) => {
     try {
@@ -158,14 +167,23 @@ export class ActivitiesService {
     }
   };
 
-    // Se obtiene todos los lenguajes desde la base de datos
-    obtenerLenguajePorId = async (id) => {
-      try {
-        return await this.conexion.executeProcedureReturnsTable('obtener_lenguaje_por_id', [id]);
-      } catch (error) {
-        return null;
-      }
-    };
+  // Se obtiene todos los lenguajes desde la base de datos
+  obtenerLenguajePorId = async (id) => {
+    try {
+      return await this.conexion.executeProcedureReturnsTable('obtener_lenguaje_por_id', [id]);
+    } catch (error) {
+      return null;
+    }
+  };
+
+  // Se obtiene todos los lenguajes desde la base de datos
+  obtenerModuloPorId = async (id) => {
+    try {
+      return await this.conexion.executeProcedureReturnsTable('obtener_modulo_por_id', [id]);
+    } catch (error) {
+      return null;
+    }
+  };
 
   cambiarEstadoActividad = async (id, estado) => {
     try {

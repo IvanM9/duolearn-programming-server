@@ -306,6 +306,23 @@ export class ActivitiesController {
     }
   }
 
+    // Se obtienen las actividades sin resolver de un usuario en un modulo basado en un tipo de pregunta
+    @Get('/actividades/obtener/:usuario/:modulo/:tipo')
+    @OpenAPI({
+      summary: 'Se obtienen las actividades sin resolver de un usuario en un modulo basado en un tipo de pregunta',
+    })
+    async obtenerActividadesSinResolver(@Param('usuario') usuario: number, @Param('modulo') modulo: number, @Param('tipo') tipo: string) {
+      try {
+        const datos = await this.activity.obtenerActividadesNoResueltas(usuario, modulo, tipo);
+        if (datos != null) {
+          return datos;
+        } else return { estado: 0 };
+      } catch (error) {
+        console.log(error);
+        return { estado: 0 };
+      }
+    }
+
   // Se obtienen los modulos correspondientes al lenguaje
   @Get('/modulo/obtener/:id')
   @OpenAPI({
@@ -322,6 +339,23 @@ export class ActivitiesController {
       return { estado: 0 };
     }
   }
+
+    // Se obtienen los modulos correspondientes al lenguaje
+    @Get('/modulo/:id')
+    @OpenAPI({
+      summary: 'Se obtienen la información de un determinado modulo',
+    })
+    async obtenerTemaPorId(@Param('id') id: number) {
+      try {
+        const datos = await this.activity.obtenerModuloPorId(id);
+        if (datos != null) {
+          return datos;
+        } else return { estado: 0 };
+      } catch (error) {
+        console.log(error);
+        return { estado: 0 };
+      }
+    }
 
   // Obtenemos todos los temas registrados
   @Get('/admin/temas/obtener')

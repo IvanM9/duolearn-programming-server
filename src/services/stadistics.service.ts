@@ -10,9 +10,10 @@ export class StadisticsService {
   }
   async getPuntajesPorModulo(usuario: number, modulo: number) {
     try {
-      return await this.conexion.executeProcedureReturnsTable('listar_puntaje_por_modulo', [usuario, modulo]);
+      return await this.conexion.executeProcedureReturnsTable('listar_puntaje_por_usuario_modulo', [usuario, modulo]);
     } catch (error) {
       return null;
     }
   }
+
 }
