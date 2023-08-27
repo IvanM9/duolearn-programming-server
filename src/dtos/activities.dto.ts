@@ -61,9 +61,6 @@ export class UpdateActivityDto extends NewActivityDto {
 }
 
 export class NewTopicDto {
-  @IsNumber()
-  public lenguajeId: number;
-
   @IsString()
   public titulo: string;
 
