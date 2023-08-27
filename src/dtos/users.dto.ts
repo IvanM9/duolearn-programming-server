@@ -1,4 +1,5 @@
-import { IsString, IsEmail, IsDateString, IsOptional, IsStrongPassword } from 'class-validator';
+import { Role } from '@/enums/role.enum';
+import { IsString, IsEmail, IsDateString, IsOptional, IsStrongPassword, IsEnum } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -24,6 +25,9 @@ export class CreateUserDto {
 
   @IsDateString({ strict: false })
   public fecha_nacimiento: Date;
+
+  @IsEnum(Role, { message: 'El tipo de usuario no es valido' })
+  public tipo: Role;
 }
 
 export class UpdateUserDto {
@@ -59,9 +63,6 @@ export class ResetPasswordDto {
 }
 
 export class ChangePasswordDto {
-  @IsString()
-  public usuario: string;
-
   @IsStrongPassword({
     minLength: 6,
     minLowercase: 1,

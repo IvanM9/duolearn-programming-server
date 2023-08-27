@@ -1,36 +1,18 @@
-import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
+import { ActivityType } from '@/enums/activity-type.enum';
+import { IsBoolean, IsEnum, IsNumber, IsNumberString, IsOptional, IsString } from 'class-validator';
 
 export class GetActivitiesDto {
   @IsNumber()
   public modulo: number;
 
-  @IsString()
-  public lenguaje: string;
-
-  @IsString()
-  public tipo: string;
-
-  @IsString()
-  public usuario: string;
-}
-
-export class GetTopicsDto {
-  @IsNumber()
-  public modulo: number;
-
-  @IsString()
-  public lenguaje: string;
+  @IsBoolean()
+  @IsOptional()
+  public activo: boolean;
 }
 
 export class ResolveActivitiesDto {
-  @IsString()
-  public usuario: string;
-
   @IsNumber()
   public id_actividad: number;
-
-  @IsDateString()
-  public fecha: string;
 
   @IsNumber()
   public minutos: number;
@@ -69,21 +51,18 @@ export class NewActivityDto {
   @IsOptional()
   public opcion4: string;
 
-  @IsString()
-  public tipo: string;
+  @IsEnum(ActivityType)
+  public tipo: ActivityType;
 }
 
 export class UpdateActivityDto extends NewActivityDto {
   @IsNumberString()
-  public id: number;  
+  public id: number;
 }
 
 export class NewTopicDto {
   @IsNumber()
-  public modulo: number;
-
-  @IsString()
-  public lenguaje: string;
+  public lenguajeId: number;
 
   @IsString()
   public titulo: string;
@@ -92,7 +71,18 @@ export class NewTopicDto {
   public concepto: string;
 }
 
-export class UpdateTopicDto extends NewTopicDto {
-  @IsNumber()
-  public id: number;
+export class UpdateTopicDto {
+  @IsString()
+  public titulo: string;
+
+  @IsString()
+  public concepto: string;
+}
+
+export class AddLanguageDto {
+  @IsString()
+  public titulo: string;
+
+  @IsString()
+  public descripcion: string;
 }

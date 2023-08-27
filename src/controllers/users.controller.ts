@@ -1,4 +1,4 @@
-import { Controller, Body, Get, Post, Delete, Res, Req, Put, Param } from 'routing-controllers';
+import { Controller, Body, Get, Post, Delete, Res, Req, Put, Param, Patch } from 'routing-controllers';
 import { Container } from 'typedi';
 import { ChangePasswordDto, CreateUserDto, ResetPasswordDto, UpdateUserDto } from '@dtos/users.dto';
 import { UserService } from '@services/users.service';
@@ -24,8 +24,8 @@ export class UserController {
   }
 
   //Se obtiene los datos del usuario
-  @Get('/usuario/datos/:usuario')
-  async getUsuario(@Param('usuario') usuario: string) {
+  @Get('/usuario/datos/:id')
+  async getUsuario(@Param('id') usuario: string) {
     try {
       const datos = await this.user.getUser(usuario);
       if (datos != null) {
@@ -59,13 +59,13 @@ export class UserController {
   }
 
   //Se obtienen todos los datos y luego se reemplaza con los valores actuales
-  @Put('/usuario/modificar')
-  async modificarUsuario(@Body() data: UpdateUserDto) {
+  @Put('/usuario/modificar/:id')
+  async modificarUsuario(@Body() data: UpdateUserDto, @Param('id') id: number) {
     try {
       const { usuario } = data;
       if (usuario != null) {
         const { nombres, apellidos, correo, fecha_nacimiento } = data;
-        const status = await this.user.modificarUser(usuario, nombres, apellidos, correo, fecha_nacimiento);
+        const status = await this.user.modificarUser(id, usuario, nombres, apellidos, correo, fecha_nacimiento);
         console.log(status);
         if (status === 1) return { mensaje: 'Modificado con exito', estado: '1' };
         else return { mensaje: 'Modificación fallida ', estado: '0' };
@@ -79,8 +79,8 @@ export class UserController {
   @Post('/usuario/nuevo')
   async nuevoUsuario(@Body() data: CreateUserDto) {
     try {
-      const { usuario, nombres, apellidos, correo, clave, fecha_nacimiento } = data;
-      const status = await this.user.registrarUser(usuario, nombres, apellidos, correo, clave, fecha_nacimiento);
+      const { usuario, nombres, apellidos, correo, clave, fecha_nacimiento, tipo } = data;
+      const status = await this.user.registrarUser(usuario, nombres, apellidos, correo, clave, fecha_nacimiento, tipo);
 
       if (status == 1) {
         return { mensaje: 'Registro correcto', estado: '1' };
@@ -92,15 +92,15 @@ export class UserController {
   }
 
   //Se elimina un usuario
-  @Delete('/usuario/eliminar/:usuario')
-  async elimnarUsuario(@Param('usuario') usuario: string, @Res() res: Response) {
+  @Delete('/usuario/eliminar/:id')
+  async elimnarUsuario(@Param('id') usuario: string, @Res() res: Response) {
     try {
       if (usuario != null) {
         const status = await this.user.eliminarUser(usuario);
         if (status === 1) {
           return { mensaje: 'Eliminado con éxito ', estado: '1' };
         } else return { mensaje: 'Eliminación fallido ', estado: '0' };
-      } else res.json({ mensaje: 'El sesión no está iniciada', estado: '0' });
+      } else res.json({ mensaje: 'La sesión no está iniciada', estado: '0' });
     } catch (error) {
       console.log(error);
       res.json({ estado: 0 });
@@ -186,10 +186,34 @@ export class UserController {
   }
 
   //Cambio de clave
-  @Post('/cambio_clave')
-  async cambiarClave(@Body() body: ChangePasswordDto) {
+  @Post('/cambio_clave/:id')
+  async cambiarClave(@Body() body: ChangePasswordDto, @Param('id') id: number) {
     try {
-      const status = await this.user.cambiarClave(body.usuario, body.clave_actual, body.clave_nueva);
+      const status = await this.user.cambiarClave(id, body.clave_actual, body.clave_nueva);
+      if (status === 1) return { estado: '1' };
+      else return { estado: '0' };
+    } catch (error) {
+      console.log(error);
+      return { estado: '0' };
+    }
+  }
+
+  @Patch('/profesor/aprobacion/:id')
+  async aprobarProfesor(@Param('id') id: number) {
+    try {
+      const status = await this.user.aprobarDocente(id);
+      if (status === 1) return { estado: '1' };
+      else return { estado: '0' };
+    } catch (error) {
+      console.log(error);
+      return { estado: '0' };
+    }
+  }
+
+  @Patch('/usuario/cambiar-estado/:id/:estado')
+  async cambiarEstado(@Param('id') id: number, @Param('estado') estado: boolean) {
+    try {
+      const status = await this.user.cambiarEstado(id, estado);
       if (status === 1) return { estado: '1' };
       else return { estado: '0' };
     } catch (error) {

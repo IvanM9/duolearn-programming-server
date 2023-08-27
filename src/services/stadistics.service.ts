@@ -8,18 +8,9 @@ export class StadisticsService {
   constructor() {
     this.conexion = new Conexion();
   }
-  async getJava(usuario: string) {
+  async getPuntajesPorModulo(usuario: number, modulo: number) {
     try {
-      return await this.conexion.executeProcedureReturnsTable('obtener_puntaje_java', [usuario]);
-    } catch (error) {
-      return null;
-    }
-  }
-
-  //Se obtienen las calificaciones de c#
-  async getCsharp(usuario: string) {
-    try {
-      return await this.conexion.executeProcedureReturnsTable('obtener_puntaje_csharp', [usuario]);
+      return await this.conexion.executeProcedureReturnsTable('listar_puntaje_por_modulo', [usuario, modulo]);
     } catch (error) {
       return null;
     }

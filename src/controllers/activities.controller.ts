@@ -1,17 +1,18 @@
 import { API_KEY, API_SECRET, CLOUD_NAME } from '@/config';
 import { ActivitiesService } from '@/services/activities.service';
-import { Body, Controller, Delete, Get, Param, Post, Put, Req } from 'routing-controllers';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, QueryParam, Req } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 import Container from 'typedi';
 import {
+  AddLanguageDto,
   GetActivitiesDto,
-  GetTopicsDto,
   NewActivityDto,
   NewTopicDto,
   ResolveActivitiesDto,
   UpdateActivityDto,
   UpdateTopicDto,
 } from '@dtos/activities.dto';
+import { ActivityType } from '@/enums/activity-type.enum';
 
 @Controller()
 export class ActivitiesController {
@@ -35,7 +36,7 @@ export class ActivitiesController {
   })
   async obtenerActividades(@Body() body: GetActivitiesDto) {
     try {
-      const datos = await this.activity.obtenerActividades(body.modulo, body.lenguaje, body.tipo, body.usuario);
+      const datos = await this.activity.obtenerActividades(body.modulo);
       if (datos != null) {
         return datos;
       } else return { mensaje: 'vacio', estado: '0' };
@@ -44,7 +45,6 @@ export class ActivitiesController {
       return { mensaje: 'vacio', estado: '0' };
     }
   }
-
 
   //Se obtiene las actividades por medio de varios restricciones
   @Get('/actividades/obtener')
@@ -63,7 +63,6 @@ export class ActivitiesController {
     }
   }
 
-
   //Se obtiene las actividades por medio de varios restricciones
   @Get('/actividades/obtener/:id')
   @OpenAPI({
@@ -81,16 +80,15 @@ export class ActivitiesController {
     }
   }
   // Se envían los datos para registrar la actividad y su nota correspondiente
-  @Post('/actividades/resolver')
+  @Post('/actividades/resolver/:usuarioId')
   @OpenAPI({
     summary: 'Se envían los datos para registrar la actividad y su nota correspondiente',
   })
-  async resolverActividad(@Body() body: ResolveActivitiesDto) {
+  async resolverActividad(@Body() body: ResolveActivitiesDto, @Param('usuarioId') usuarioId: number) {
     try {
       const isSaved = await this.activity.resolverActividad(
-        body.usuario,
+        usuarioId,
         body.id_actividad,
-        body.fecha,
         body.minutos,
         body.intentos,
         body.num_actividad,
@@ -111,14 +109,14 @@ export class ActivitiesController {
   async agregarActividad(@Body() body: NewActivityDto, @Req() req) {
     try {
       const { tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo } = body;
-      let status, _pregunta, _opcion1;
+      let _pregunta, _opcion1;
       switch (tipo) {
-        case 'encontrar-error':
+        case ActivityType.BUGS:
           _pregunta = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
 
           _opcion1 = opcion_correcta;
           break;
-        case 'pares':
+        case ActivityType.PAIR:
           _pregunta = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
           _opcion1 = (await this.cloudinary.v2.uploader.upload(req.files[1].path)).secure_url.trim();
           break;
@@ -128,13 +126,61 @@ export class ActivitiesController {
           break;
       }
 
-      status = await this.activity.añadirActividad(tema, _pregunta, _opcion1, opcion2, opcion3, opcion4, tipo);
+      const status = await this.activity.añadirActividad(tema, _pregunta, _opcion1, opcion2, opcion3, opcion4, tipo);
 
-      if (req.files != undefined) {
-        for (const element of req.files) {
-          await this.fs.unlink(element.path);
-        }
+      await this.deleteLocalFiles(req.files);
+
+      return { estado: status };
+    } catch (error) {
+      console.log(error);
+      return { estado: '0' };
+    }
+  }
+
+  private async deleteLocalFiles(files) {
+    if (files != undefined) {
+      for (const element of files) {
+        await this.fs.unlink(element.path);
       }
+    }
+  }
+
+  @Post('/admin/lenguaje/agregar')
+  @OpenAPI({ summary: 'Se inserta un nuevo lenguaje' })
+  async agregarLenguaje(@Body() body: AddLanguageDto, @Req() req) {
+    try {
+      const { titulo, descripcion } = body;
+      let portada;
+      if (req.files.length != 0) {
+        portada = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
+      } else {
+        portada = '';
+      }
+      const status = await this.activity.agregarLenguaje(titulo, descripcion, portada);
+
+      await this.deleteLocalFiles(req.files);
+
+      return { estado: status };
+    } catch (error) {
+      console.log(error);
+      return { estado: '0' };
+    }
+  }
+
+  @Patch('/admin/lenguaje/modificar/:id')
+  @OpenAPI({ summary: 'Se modifica un lenguaje' })
+  async modificarLenguaje(@Body() body: AddLanguageDto, @Param('id') id: number, @Req() req) {
+    try {
+      const { titulo, descripcion } = body;
+      let portada;
+      if (req.files.length != 0) {
+        portada = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
+      } else {
+        portada = '';
+      }
+      const status = await this.activity.modificarLenguaje(id, titulo, descripcion, portada);
+
+      await this.deleteLocalFiles(req.files);
 
       return { estado: status };
     } catch (error) {
@@ -144,13 +190,19 @@ export class ActivitiesController {
   }
 
   // Se inserta un nuevo tema
-  @Post('/admin/temas/agregar')
+  @Post('/admin/modulo/agregar')
   @OpenAPI({
-    summary: 'Se inserta un nuevo tema ',
+    summary: 'Se inserta un nuevo modulo ',
   })
-  async agregarTema(@Body() body: NewTopicDto) {
+  async agregarModulo(@Body() body: NewTopicDto, @Req() req) {
     try {
-      const status = await this.activity.añadirTema(body.modulo, body.lenguaje, body.titulo, body.concepto);
+      let icono;
+      if (req.files.length != 0) {
+        icono = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
+      } else {
+        icono = '';
+      }
+      const status = await this.activity.añadirModulo(body.lenguajeId, body.titulo, body.concepto, icono);
       if (status != null) return { estado: status };
       else return { estado: 0 };
     } catch (error) {
@@ -160,13 +212,19 @@ export class ActivitiesController {
   }
 
   // Se modifica un tema
-  @Put('/admin/temas/modificar')
+  @Put('/admin/modulo/modificar/:id')
   @OpenAPI({
     summary: 'Se modifica un tema',
   })
-  async modificarTema(@Body() body: UpdateTopicDto) {
+  async modificarTema(@Body() body: UpdateTopicDto, @Param('id') id: number, @Req() req) {
     try {
-      const status = await this.activity.modificarTema(body.id, body.modulo, body.lenguaje, body.titulo, body.concepto);
+      let icono;
+      if (req.files.length != 0) {
+        icono = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
+      } else {
+        icono = '';
+      }
+      const status = await this.activity.modificarTema(id, body.titulo, body.concepto, icono);
       return { estado: status };
     } catch (error) {
       return { estado: '0' };
@@ -181,24 +239,22 @@ export class ActivitiesController {
   async modificarActividad(@Body() body: UpdateActivityDto, @Req() req) {
     try {
       const { id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo } = body;
-      let status, _pregunta, _opcion1;
+      let _pregunta, _opcion1;
       switch (tipo) {
         case 'encontrar-error':
-          if(req.files.length != 0){
+          if (req.files.length != 0) {
             _pregunta = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
-          }
-          else{
-            _pregunta = pregunta
+          } else {
+            _pregunta = pregunta;
           }
           _opcion1 = opcion_correcta;
           break;
         case 'pares':
-          if(req.files.length != 0){
+          if (req.files.length != 0) {
             _pregunta = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
             _opcion1 = (await this.cloudinary.v2.uploader.upload(req.files[1].path)).secure_url.trim();
-          }
-          else{
-            _pregunta = pregunta
+          } else {
+            _pregunta = pregunta;
             _opcion1 = opcion_correcta;
           }
           break;
@@ -207,7 +263,8 @@ export class ActivitiesController {
           _opcion1 = opcion_correcta;
           break;
       }
-      status = await this.activity.modificarActividad(id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo);
+
+      const status = await this.activity.modificarActividad(id, tema, _pregunta, _opcion1, opcion2, opcion3, opcion4, tipo);
 
       if (req.files != undefined) {
         for (const element of req.files) {
@@ -250,13 +307,13 @@ export class ActivitiesController {
   }
 
   // Se obtiene una la teoría correspondiente al módulo y al lenguaje
-  @Post('/temas/obtener')
+  @Get('/modulo/obtener/:id')
   @OpenAPI({
     summary: 'Se obtiene una la teoría correspondiente al módulo y al lenguaje',
   })
-  async obtenerTemas(@Body() body: GetTopicsDto) {
+  async obtenerTemas(@Param('id') id: number, @QueryParam('activo') activo: boolean) {
     try {
-      const datos = await this.activity.obtenerTemas(body.modulo, body.lenguaje);
+      const datos = await this.activity.obtenerTemas(id, activo);
       if (datos != null) {
         return datos;
       } else return { estado: 0 };
@@ -279,6 +336,39 @@ export class ActivitiesController {
     } catch (error) {
       console.log(error);
       return { estado: 0 };
+    }
+  }
+
+  @Patch('/admin/modulo/cambiar-estado/:id/:estado')
+  @OpenAPI({ summary: 'Se cambia el estado de un módulo' })
+  async cambiarEstadoModulo(@Param('id') id: number, @Param('estado') estado: boolean) {
+    try {
+      const status = await this.activity.cambiarEstadoModulo(id, estado);
+      return { estado: status };
+    } catch (error) {
+      return { estado: '0' };
+    }
+  }
+
+  @Patch('/admin/actividades/cambiar-estado/:id/:estado')
+  @OpenAPI({ summary: 'Se cambia el estado de una actividad' })
+  async cambiarEstadoActividad(@Param('id') id: number, @Param('estado') estado: boolean) {
+    try {
+      const status = await this.activity.cambiarEstadoActividad(id, estado);
+      return { estado: status };
+    } catch (error) {
+      return { estado: '0' };
+    }
+  }
+
+  @Patch('/admin/lenguaje/cambiar-estado/:id/:estado')
+  @OpenAPI({ summary: 'Se cambia el estado de un lenguaje' })
+  async cambiarEstadoLenguaje(@Param('id') id: number, @Param('estado') estado: boolean) {
+    try {
+      const status = await this.activity.cambiarEstadoLenguaje(id, estado);
+      return { estado: status };
+    } catch (error) {
+      return { estado: '0' };
     }
   }
 }
