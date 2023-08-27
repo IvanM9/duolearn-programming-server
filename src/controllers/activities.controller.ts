@@ -339,6 +339,38 @@ export class ActivitiesController {
     }
   }
 
+  // Obtenemos todos los lenguajes
+  @Get('/admin/lenguajes/obtener')
+  @OpenAPI({
+    summary: 'Obtenemos todos los lenguajes registrados',
+  })
+  async listarLenguajes() {
+    try {
+      const datos = await this.activity.listarLenguajes();
+      if (datos != null) return datos;
+      else return { estado: 0 };
+    } catch (error) {
+      console.log(error);
+      return { estado: 0 };
+    }
+  }
+
+  // Obtenemos todos los lenguajes
+  @Get('/admin/lenguajes/obtener/:id')
+  @OpenAPI({
+    summary: 'Obtenemos info de un determinado lenguaje',
+  })
+  async obtenerLenguajeId(@Param('id') id: number) {
+    try {
+      const datos = await this.activity.obtenerLenguajePorId(id);
+      if (datos != null) return datos;
+      else return { estado: 0 };
+    } catch (error) {
+      console.log(error);
+      return { estado: 0 };
+    }
+  }
+
   @Patch('/admin/modulo/cambiar-estado/:id/:estado')
   @OpenAPI({ summary: 'Se cambia el estado de un módulo' })
   async cambiarEstadoModulo(@Param('id') id: number, @Param('estado') estado: boolean) {
