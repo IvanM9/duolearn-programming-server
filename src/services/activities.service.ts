@@ -55,7 +55,7 @@ export class ActivitiesService {
   };
 
   //Se envían los datos para crear un nuevo tema
-  añadirModulo = async (lenguajeId, titulo, concepto, icono) => {
+  agregarModulo = async (lenguajeId, titulo, concepto, icono) => {
     try {
       await this.conexion.executeProcedureReturnsInt('agregar_modulo_por_lenguaje', [lenguajeId, concepto, titulo, icono]);
       return 1;
