@@ -306,10 +306,10 @@ export class ActivitiesController {
     }
   }
 
-  // Se obtiene una la teoría correspondiente al módulo y al lenguaje
+  // Se obtienen los modulos correspondientes al lenguaje
   @Get('/modulo/obtener/:id')
   @OpenAPI({
-    summary: 'Se obtiene una la teoría correspondiente al módulo y al lenguaje',
+    summary: 'Se obtienen los modulos correspondientes al lenguaje',
   })
   async obtenerTemas(@Param('id') id: number, @QueryParam('activo') activo: boolean) {
     try {
