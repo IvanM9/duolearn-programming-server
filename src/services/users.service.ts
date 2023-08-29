@@ -8,9 +8,9 @@ export class UserService {
     this.conexion = new Conexion();
   }
 
-  listarUsuarios = async () => {
+  listarUsuarios = async (estado?: boolean) => {
     try {
-      return await this.conexion.executeProcedureReturnsTable('listar_usuarios');
+      return await this.conexion.executeProcedureReturnsTable('listar_usuarios', [estado]);
     } catch (error) {
       console.log(error);
       return null;
