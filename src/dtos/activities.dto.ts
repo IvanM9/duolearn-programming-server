@@ -1,14 +1,5 @@
 import { ActivityType } from '@/enums/activity-type.enum';
-import { IsBoolean, IsEnum, IsNumber, IsNumberString, IsOptional, IsString } from 'class-validator';
-
-export class GetActivitiesDto {
-  @IsNumber()
-  public modulo: number;
-
-  @IsBoolean()
-  @IsOptional()
-  public activo: boolean;
-}
+import { IsEnum, IsNumber, IsNumberString, IsOptional, IsString } from 'class-validator';
 
 export class ResolveActivitiesDto {
   @IsNumber()

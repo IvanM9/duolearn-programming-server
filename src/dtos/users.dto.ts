@@ -24,6 +24,7 @@ export class CreateUserDto {
   public clave: string;
 
   @IsDateString({ strict: false })
+  @IsOptional()
   public fecha_nacimiento: Date;
 
   @IsEnum(Role, { message: 'El tipo de usuario no es valido' })

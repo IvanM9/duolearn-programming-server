@@ -3,15 +3,7 @@ import { ActivitiesService } from '@/services/activities.service';
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, QueryParam, Req } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 import Container from 'typedi';
-import {
-  AddLanguageDto,
-  GetActivitiesDto,
-  NewActivityDto,
-  NewTopicDto,
-  ResolveActivitiesDto,
-  UpdateActivityDto,
-  UpdateTopicDto,
-} from '@dtos/activities.dto';
+import { AddLanguageDto, NewActivityDto, NewTopicDto, ResolveActivitiesDto, UpdateActivityDto, UpdateTopicDto } from '@dtos/activities.dto';
 import { ActivityType } from '@/enums/activity-type.enum';
 
 @Controller()
@@ -30,13 +22,13 @@ export class ActivitiesController {
   }
 
   //Se obtiene las actividades por medio de varios restricciones
-  @Post('/actividades/obtener')
+  @Get('/actividades/obtener/:modulo/:activo')
   @OpenAPI({
     summary: 'Se obtiene las actividades por medio de varios restricciones',
   })
-  async obtenerActividades(@Body() body: GetActivitiesDto) {
+  async obtenerActividades(@Param('modulo') modulo: number, @Param('activo') activo: boolean) {
     try {
-      const datos = await this.activity.obtenerActividades(body.modulo);
+      const datos = await this.activity.obtenerActividades(modulo, activo);
       if (datos != null) {
         return datos;
       } else return { mensaje: 'vacio', estado: '0' };
@@ -47,7 +39,7 @@ export class ActivitiesController {
   }
 
   //Se obtiene las actividades por medio de varios restricciones
-  @Get('/actividades/obtener')
+  @Get('/actividades/obtener/all')
   @OpenAPI({
     summary: 'Se obtienem todas las actividades',
   })
@@ -284,22 +276,22 @@ export class ActivitiesController {
     }
   }
 
-    // Se obtienen las actividades sin resolver de un usuario en un modulo basado en un tipo de pregunta
-    @Get('/actividades/obtener/:usuario/:modulo/:tipo')
-    @OpenAPI({
-      summary: 'Se obtienen las actividades sin resolver de un usuario en un modulo basado en un tipo de pregunta',
-    })
-    async obtenerActividadesSinResolver(@Param('usuario') usuario: number, @Param('modulo') modulo: number, @Param('tipo') tipo: string) {
-      try {
-        const datos = await this.activity.obtenerActividadesNoResueltas(usuario, modulo, tipo);
-        if (datos != null) {
-          return datos;
-        } else return { estado: 0 };
-      } catch (error) {
-        console.log(error);
-        return { estado: 0 };
-      }
+  // Se obtienen las actividades sin resolver de un usuario en un modulo basado en un tipo de pregunta
+  @Get('/actividades/obtener/:usuario/:modulo/:tipo')
+  @OpenAPI({
+    summary: 'Se obtienen las actividades sin resolver de un usuario en un modulo basado en un tipo de pregunta',
+  })
+  async obtenerActividadesSinResolver(@Param('usuario') usuario: number, @Param('modulo') modulo: number, @Param('tipo') tipo: string) {
+    try {
+      const datos = await this.activity.obtenerActividadesNoResueltas(usuario, modulo, tipo);
+      if (datos != null) {
+        return datos;
+      } else return { estado: 0 };
+    } catch (error) {
+      console.log(error);
+      return { estado: 0 };
     }
+  }
 
   // Se obtienen los modulos correspondientes al lenguaje
   @Get('/modulo/obtener/:id')
@@ -318,22 +310,22 @@ export class ActivitiesController {
     }
   }
 
-    // Se obtienen los modulos correspondientes al lenguaje
-    @Get('/modulo/:id')
-    @OpenAPI({
-      summary: 'Se obtienen la información de un determinado modulo',
-    })
-    async obtenerTemaPorId(@Param('id') id: number) {
-      try {
-        const datos = await this.activity.obtenerModuloPorId(id);
-        if (datos != null) {
-          return datos;
-        } else return { estado: 0 };
-      } catch (error) {
-        console.log(error);
-        return { estado: 0 };
-      }
+  // Se obtienen los modulos correspondientes al lenguaje
+  @Get('/modulo/:id')
+  @OpenAPI({
+    summary: 'Se obtienen la información de un determinado modulo',
+  })
+  async obtenerTemaPorId(@Param('id') id: number) {
+    try {
+      const datos = await this.activity.obtenerModuloPorId(id);
+      if (datos != null) {
+        return datos;
+      } else return { estado: 0 };
+    } catch (error) {
+      console.log(error);
+      return { estado: 0 };
     }
+  }
 
   // Obtenemos todos los temas registrados
   @Get('/admin/temas/obtener')

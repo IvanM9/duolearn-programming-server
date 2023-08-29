@@ -1,4 +1,4 @@
-import { Controller, Body, Get, Post, Delete, Res, Req, Put, Param, Patch } from 'routing-controllers';
+import { Controller, Body, Get, Post, Delete, Res, Req, Put, Param, Patch, QueryParam } from 'routing-controllers';
 import { Container } from 'typedi';
 import { ChangePasswordDto, CreateUserDto, ResetPasswordDto, UpdateUserDto } from '@dtos/users.dto';
 import { UserService } from '@services/users.service';
@@ -14,9 +14,9 @@ export class UserController {
   // const client_secret = "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";
 
   @Get('/admin/usuarios/listar')
-  async listarUsuarios() {
+  async listarUsuarios(@QueryParam('estado') estado: boolean) {
     try {
-      return await this.user.listarUsuarios();
+      return await this.user.listarUsuarios(estado);
     } catch (error) {
       console.log(error);
       return { estado: 0 };
@@ -25,7 +25,7 @@ export class UserController {
 
   //Se obtiene los datos del usuario
   @Get('/usuario/datos/:id')
-  async getUsuario(@Param('id') id:number) {
+  async getUsuario(@Param('id') id: number) {
     try {
       const datos = await this.user.getUser(id);
       if (datos != null) {
