@@ -5,6 +5,7 @@ import { OpenAPI } from 'routing-controllers-openapi';
 import Container from 'typedi';
 import { AddLanguageDto, NewActivityDto, NewTopicDto, ResolveActivitiesDto, UpdateActivityDto, UpdateTopicDto } from '@dtos/activities.dto';
 import { ActivityType } from '@/enums/activity-type.enum';
+import { HttpException } from '@exceptions/httpException';
 
 @Controller()
 export class ActivitiesController {
@@ -31,10 +32,10 @@ export class ActivitiesController {
       const datos = await this.activity.obtenerActividades(modulo, activo);
       if (datos != null) {
         return datos;
-      } else return { mensaje: 'vacio', estado: '0' };
+      } else throw new HttpException(500, 'Error al obtener las actividades');
     } catch (error) {
       console.log(error);
-      return { mensaje: 'vacio', estado: '0' };
+      throw new HttpException(500, 'Error al obtener las actividades');
     }
   }
 
@@ -51,7 +52,7 @@ export class ActivitiesController {
       } else return { mensaje: 'vacio', estado: '0' };
     } catch (error) {
       console.log(error);
-      return { mensaje: 'vacio', estado: '0' };
+      throw new HttpException(500, 'Error al obtener las actividades');
     }
   }
 
@@ -65,10 +66,10 @@ export class ActivitiesController {
       const datos = await this.activity.obtenerActividadId(id);
       if (datos != null) {
         return datos;
-      } else return { mensaje: 'vacio', estado: '0' };
+      } else throw new HttpException(500, 'Error al obtener las actividades');
     } catch (error) {
       console.log(error);
-      return { mensaje: 'vacio', estado: '0' };
+      throw new HttpException(500, 'Error al obtener las actividades');
     }
   }
   // Se envían los datos para registrar la actividad y su nota correspondiente
@@ -89,7 +90,7 @@ export class ActivitiesController {
       return { estado: isSaved };
     } catch (error) {
       console.log(error);
-      return { estado: '0' };
+      throw new HttpException(500, 'Error al resolver la actividad');
     }
   }
 
@@ -125,7 +126,7 @@ export class ActivitiesController {
       return { estado: status };
     } catch (error) {
       console.log(error);
-      return { estado: '0' };
+      throw new HttpException(500, 'Error al agregar la actividad');
     }
   }
 
@@ -155,7 +156,7 @@ export class ActivitiesController {
       return { estado: status };
     } catch (error) {
       console.log(error);
-      return { estado: '0' };
+      throw new HttpException(500, 'Error al agregar el lenguaje');
     }
   }
 
@@ -165,7 +166,7 @@ export class ActivitiesController {
     try {
       const { titulo, descripcion } = body;
       let portada;
-      if (req.files.length != 0) {
+      if (req.files?.length != 0) {
         portada = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
       } else {
         portada = '';
@@ -177,7 +178,7 @@ export class ActivitiesController {
       return { estado: status };
     } catch (error) {
       console.log(error);
-      return { estado: '0' };
+      throw new HttpException(500, 'Error al modificar el lenguaje');
     }
   }
 
@@ -197,7 +198,7 @@ export class ActivitiesController {
       const status = await this.activity.modificarTema(id, body.titulo, body.concepto, icono);
       return { estado: status };
     } catch (error) {
-      return { estado: '0' };
+      throw new HttpException(500, 'Error al modificar el tema');
     }
   }
 
@@ -236,15 +237,11 @@ export class ActivitiesController {
 
       const status = await this.activity.modificarActividad(id, tema, _pregunta, _opcion1, opcion2, opcion3, opcion4, tipo);
 
-      if (req.files != undefined) {
-        for (const element of req.files) {
-          await this.fs.unlink(element.path);
-        }
-      }
+      await this.deleteLocalFiles(req.files);
 
       return { estado: status };
     } catch (error) {
-      return { estado: '0' };
+      throw new HttpException(500, 'Error al modificar la actividad');
     }
   }
 
@@ -258,7 +255,7 @@ export class ActivitiesController {
       const status = await this.activity.eliminarActividad(id);
       return { estado: status };
     } catch (error) {
-      return { estado: '0' };
+      throw new HttpException(500, 'Error al eliminar la actividad');
     }
   }
 
@@ -272,7 +269,7 @@ export class ActivitiesController {
       const status = await this.activity.eliminarTema(id);
       return { estado: status };
     } catch (error) {
-      return { estado: '0' };
+      throw new HttpException(500, 'Error al eliminar el tema');
     }
   }
 
@@ -289,7 +286,7 @@ export class ActivitiesController {
       } else return { estado: 0 };
     } catch (error) {
       console.log(error);
-      return { estado: 0 };
+      throw new HttpException(500, 'Error al obtener las actividades');
     }
   }
 
@@ -303,10 +300,10 @@ export class ActivitiesController {
       const datos = await this.activity.obtenerTemas(id, activo);
       if (datos != null) {
         return datos;
-      } else return { estado: 0 };
+      } else throw new HttpException(500, 'Error al obtener los temas');
     } catch (error) {
       console.log(error);
-      return { estado: 0 };
+      throw new HttpException(500, 'Error al obtener los temas');
     }
   }
 
@@ -320,10 +317,10 @@ export class ActivitiesController {
       const datos = await this.activity.obtenerModuloPorId(id);
       if (datos != null) {
         return datos;
-      } else return { estado: 0 };
+      } else throw new HttpException(500, 'Error al obtener los temas');
     } catch (error) {
       console.log(error);
-      return { estado: 0 };
+      throw new HttpException(500, 'Error al obtener los temas');
     }
   }
 
@@ -336,10 +333,10 @@ export class ActivitiesController {
     try {
       const datos = await this.activity.listarTemas();
       if (datos != null) return datos;
-      else return { estado: 0 };
+      else throw new HttpException(500, 'Error al obtener los temas');
     } catch (error) {
       console.log(error);
-      return { estado: 0 };
+      throw new HttpException(500, 'Error al obtener los temas');
     }
   }
 
@@ -352,10 +349,10 @@ export class ActivitiesController {
     try {
       const datos = await this.activity.listarLenguajes();
       if (datos != null) return datos;
-      else return { estado: 0 };
+      else throw new HttpException(500, 'Error al obtener los lenguajes');
     } catch (error) {
       console.log(error);
-      return { estado: 0 };
+      throw new HttpException(500, 'Error al obtener los lenguajes');
     }
   }
 
@@ -368,10 +365,10 @@ export class ActivitiesController {
     try {
       const datos = await this.activity.obtenerLenguajePorId(id);
       if (datos != null) return datos;
-      else return { estado: 0 };
+      else throw new HttpException(500, 'Error al obtener los lenguajes');
     } catch (error) {
       console.log(error);
-      return { estado: 0 };
+      throw new HttpException(500, 'Error al obtener los lenguajes');
     }
   }
 
@@ -382,7 +379,7 @@ export class ActivitiesController {
       const status = await this.activity.cambiarEstadoModulo(id, estado);
       return { estado: status };
     } catch (error) {
-      return { estado: '0' };
+      throw new HttpException(500, 'Error al cambiar el estado del módulo');
     }
   }
 
@@ -393,7 +390,7 @@ export class ActivitiesController {
       const status = await this.activity.cambiarEstadoActividad(id, estado);
       return { estado: status };
     } catch (error) {
-      return { estado: '0' };
+      throw new HttpException(500, 'Error al cambiar el estado de la actividad');
     }
   }
 
@@ -404,7 +401,7 @@ export class ActivitiesController {
       const status = await this.activity.cambiarEstadoLenguaje(id, estado);
       return { estado: status };
     } catch (error) {
-      return { estado: '0' };
+      throw new HttpException(500, 'Error al cambiar el estado del lenguaje');
     }
   }
 
@@ -426,7 +423,7 @@ export class ActivitiesController {
       return { estado: status };
     } catch (error) {
       console.log(error);
-      return { estado: '0' };
+      throw new HttpException(500, 'Error al agregar el módulo');
     }
   }
 }
