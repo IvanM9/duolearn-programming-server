@@ -11,7 +11,7 @@ export class ActivitiesService {
   //Se llama a la función para obtener las actividades
   obtenerActividades = async (modulo, activo?: boolean) => {
     try {
-      return await this.conexion.executeProcedureReturnsTable('listar_actividades', [modulo, activo]);
+      return await this.conexion.executeProcedureReturnsTable('listar_actividades_por_modulo', [modulo, activo]);
     } catch (error) {
       return null;
     }
@@ -29,20 +29,20 @@ export class ActivitiesService {
   //Se llama a la función para obtener una actividad por id
   obtenerActividadId = async (id: any) => {
     try {
-      return await this.conexion.executeProcedureReturnsTable('obtener_actividad_id', [id]);
+      return await this.conexion.executeProcedureReturnsTable('obtener_actividad_por_id', [id]);
     } catch (error) {
       return null;
     }
   };
 
-    //Se llama a la función para obtener una actividad por id
-    obtenerActividadesNoResueltas = async (usuarioId: any, moduloId: any, tipoPregunta: any) => {
-      try {
-        return await this.conexion.executeProcedureReturnsTable('obtener_actividades_no_resueltas', [usuarioId, moduloId, tipoPregunta]);
-      } catch (error) {
-        return null;
-      }
-    };
+  //Se llama a la función para obtener una actividad por id
+  obtenerActividadesNoResueltas = async (usuarioId: any, moduloId: any, tipoPregunta: any) => {
+    try {
+      return await this.conexion.executeProcedureReturnsTable('obtener_actividades_no_resueltas', [usuarioId, moduloId, tipoPregunta]);
+    } catch (error) {
+      return null;
+    }
+  };
 
   //Se envian los datos de la actividad a la base de datos
   resolverActividad = async (usuario, id_actividad, minutos, intentos, num_actividad, puntaje) => {
@@ -168,7 +168,7 @@ export class ActivitiesService {
   };
 
   // Se obtiene todos los lenguajes desde la base de datos
-  obtenerLenguajePorId = async (id) => {
+  obtenerLenguajePorId = async id => {
     try {
       return await this.conexion.executeProcedureReturnsTable('obtener_lenguaje_por_id', [id]);
     } catch (error) {
@@ -177,7 +177,7 @@ export class ActivitiesService {
   };
 
   // Se obtiene todos los lenguajes desde la base de datos
-  obtenerModuloPorId = async (id) => {
+  obtenerModuloPorId = async id => {
     try {
       return await this.conexion.executeProcedureReturnsTable('obtener_modulo_por_id', [id]);
     } catch (error) {
