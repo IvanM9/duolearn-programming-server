@@ -44,9 +44,9 @@ export class ActivitiesController {
   @OpenAPI({
     summary: 'Se obtienem todas las actividades',
   })
-  async obtenerActividadesAll() {
+  async obtenerActividadesAll(@QueryParam('estado') estado: boolean) {
     try {
-      const datos = await this.activity.obtenerActividadesAll();
+      const datos = await this.activity.obtenerActividadesAll(estado);
       if (datos != null) {
         return datos;
       } else return { mensaje: 'vacio', estado: '0' };
@@ -164,14 +164,14 @@ export class ActivitiesController {
   @OpenAPI({ summary: 'Se modifica un lenguaje' })
   async modificarLenguaje(@Body() body: AddLanguageDto, @Param('id') id: number, @Req() req) {
     try {
-      const { titulo, descripcion } = body;
-      let portada;
+      const { titulo, portada, descripcion } = body;
+      let portadaSend;
       if (req.files?.length != 0) {
-        portada = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
+        portadaSend = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
       } else {
-        portada = '';
+        portadaSend = portada;
       }
-      const status = await this.activity.modificarLenguaje(id, titulo, descripcion, portada);
+      const status = await this.activity.modificarLenguaje(id, titulo, descripcion, portadaSend);
 
       await this.deleteLocalFiles(req.files);
 
@@ -189,13 +189,14 @@ export class ActivitiesController {
   })
   async modificarTema(@Body() body: UpdateTopicDto, @Param('id') id: number, @Req() req) {
     try {
-      let icono;
+      const { concepto, icono, titulo } = body;
+      let icono_send;
       if (req.files.length != 0) {
-        icono = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
+        icono_send = (await this.cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
       } else {
-        icono = '';
+        icono_send = icono;
       }
-      const status = await this.activity.modificarTema(id, body.titulo, body.concepto, icono);
+      const status = await this.activity.modificarTema(id, body.titulo, body.concepto, icono_send);
       return { estado: status };
     } catch (error) {
       throw new HttpException(500, 'Error al modificar el tema');
@@ -345,9 +346,9 @@ export class ActivitiesController {
   @OpenAPI({
     summary: 'Obtenemos todos los lenguajes registrados',
   })
-  async listarLenguajes() {
+  async listarLenguajes(@QueryParam('estado') _estado_activo: boolean) {
     try {
-      const datos = await this.activity.listarLenguajes();
+      const datos = await this.activity.listarLenguajes(_estado_activo);
       if (datos != null) return datos;
       else throw new HttpException(500, 'Error al obtener los lenguajes');
     } catch (error) {

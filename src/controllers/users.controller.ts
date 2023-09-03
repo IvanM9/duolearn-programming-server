@@ -83,8 +83,8 @@ export class UserController {
       const status = await this.user.registrarUser(usuario, nombres, apellidos, correo, clave, fecha_nacimiento, tipo);
 
       if (status == 1) {
-        return { mensaje: 'Registro correcto', estado: '1' };
-      } else return { mensaje: 'Registro fallido', estado: '0' };
+        return { mensaje: 'Registro correcto', estado: 1 };
+      } else return { mensaje: 'Registro fallido', estado: status };
     } catch (error) {
       console.log(error);
       return { estado: 0 };

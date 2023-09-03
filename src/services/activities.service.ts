@@ -18,9 +18,9 @@ export class ActivitiesService {
   };
 
   //Se llama a la función para obtener las actividades
-  obtenerActividadesAll = async () => {
+  obtenerActividadesAll = async (estado:boolean) => {
     try {
-      return await this.conexion.executeProcedureReturnsTable('obtener_actividades_all');
+      return await this.conexion.executeProcedureReturnsTable('obtener_actividades_all', [estado]);
     } catch (error) {
       return null;
     }
@@ -66,8 +66,7 @@ export class ActivitiesService {
   //Se envían los datos para crear un nuevo tema
   agregarModulo = async (lenguajeId, titulo, concepto, icono) => {
     try {
-      await this.conexion.executeProcedureReturnsInt('agregar_modulo_por_lenguaje', [lenguajeId, concepto, titulo, icono]);
-      return 1;
+      return await this.conexion.executeProcedureReturnsInt('agregar_modulo_por_lenguaje', [lenguajeId, concepto, titulo, icono]);
     } catch (error) {
       console.log(error);
       return 0;
@@ -107,14 +106,13 @@ export class ActivitiesService {
   modificarActividad = async (id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo) => {
     try {
       return await this.conexion.executeProcedureReturnsInt('modificar_actividad', [
-        id,
-        tema,
+        Number.parseInt(id),
+        Number.parseInt(tema),
         pregunta,
         opcion_correcta,
         opcion2,
         opcion3,
         opcion4,
-        tipo,
       ]);
     } catch (error) {
       console.log(error);
@@ -159,9 +157,9 @@ export class ActivitiesService {
   };
 
   // Se obtiene todos los lenguajes desde la base de datos
-  listarLenguajes = async () => {
+  listarLenguajes = async (_estado_activo) => {
     try {
-      return await this.conexion.executeProcedureReturnsTable('listar_lenguajes', null);
+      return await this.conexion.executeProcedureReturnsTable('listar_lenguajes', [_estado_activo]);
     } catch (error) {
       return null;
     }

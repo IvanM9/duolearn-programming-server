@@ -64,12 +64,20 @@ export class UpdateTopicDto {
   public titulo: string;
 
   @IsString()
+  @IsOptional()
+  public icono: string;
+
+  @IsString()
   public concepto: string;
 }
 
 export class AddLanguageDto {
   @IsString()
   public titulo: string;
+
+  @IsString()
+  @IsOptional()
+  public portada: string;
 
   @IsString()
   public descripcion: string;
