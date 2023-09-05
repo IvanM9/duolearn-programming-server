@@ -47,7 +47,7 @@ export class ActivitiesService {
   //Se envian los datos de la actividad a la base de datos
   resolverActividad = async (usuario, id_actividad, minutos, intentos, num_actividad, puntaje) => {
     try {
-      return await this.conexion.executeProcedureReturnsString('agregar_puntaje', [id_actividad, usuario, minutos, intentos, num_actividad, puntaje]);
+      return await this.conexion.executeProcedureReturnsInt('agregar_puntaje', [id_actividad, usuario, minutos, intentos, num_actividad, puntaje]);
     } catch (error) {
       return null;
     }
