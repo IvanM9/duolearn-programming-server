@@ -38,9 +38,9 @@ export class UserService {
   };
 
   //Se envian los datos para hacer la actualización
-  modificarUser = async (id, usuario, nombres, apellidos, correo, fecha_nacimiento) => {
+  modificarUser = async (id, nombres, apellidos, correo, fecha_nacimiento) => {
     try {
-      return await this.conexion.executeProcedureReturnsInt('modificar_usuario', [id, usuario, nombres, apellidos, correo, fecha_nacimiento]);
+      return await this.conexion.executeProcedureReturnsInt('modificar_usuario', [id, nombres, apellidos, correo, fecha_nacimiento]);
     } catch (error) {
       console.log(error);
       return null;

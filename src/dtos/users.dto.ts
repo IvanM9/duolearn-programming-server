@@ -1,5 +1,5 @@
 import { Role } from '@/enums/role.enum';
-import { IsString, IsEmail, IsDateString, IsOptional, IsStrongPassword, IsEnum } from 'class-validator';
+import { IsString, IsEmail, IsDateString, IsOptional, IsStrongPassword, IsEnum, IsNumber } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -32,8 +32,8 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto {
-  @IsString()
-  public usuario: string;
+  @IsNumber()
+  public usuario_id: number;
 
   @IsString()
   public nombres: string;
@@ -65,7 +65,7 @@ export class ResetPasswordDto {
 
 export class ChangePasswordDto {
   @IsStrongPassword({
-    minLength: 6,
+    minLength: 8,
     minLowercase: 1,
     minUppercase: 1,
     minNumbers: 1,
