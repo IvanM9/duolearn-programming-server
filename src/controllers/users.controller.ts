@@ -188,7 +188,7 @@ export class UserController {
     try {
       const status = await this.user.cambiarClave(id, body.clave_actual, body.clave_nueva);
       if (status === 1) return { estado: '1' };
-      else return { estado: '0' };
+      else return { estado: status };
     } catch (error) {
       console.log(error);
       return { estado: '0' };
