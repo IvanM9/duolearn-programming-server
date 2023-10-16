@@ -18,7 +18,7 @@ export class ActivitiesService {
   };
 
   //Se llama a la función para obtener las actividades
-  obtenerActividadesAll = async (estado:boolean) => {
+  obtenerActividadesAll = async (estado: boolean) => {
     try {
       return await this.conexion.executeProcedureReturnsTable('obtener_actividades_all', [estado]);
     } catch (error) {
@@ -103,7 +103,7 @@ export class ActivitiesService {
   };
 
   // Se modifican los datos de una actividad
-  modificarActividad = async (id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4, tipo) => {
+  modificarActividad = async (id, tema, pregunta, opcion_correcta, opcion2, opcion3, opcion4) => {
     try {
       return await this.conexion.executeProcedureReturnsInt('modificar_actividad', [
         Number.parseInt(id),
@@ -157,7 +157,7 @@ export class ActivitiesService {
   };
 
   // Se obtiene todos los lenguajes desde la base de datos
-  listarLenguajes = async (_estado_activo) => {
+  listarLenguajes = async _estado_activo => {
     try {
       return await this.conexion.executeProcedureReturnsTable('listar_lenguajes', [_estado_activo]);
     } catch (error) {

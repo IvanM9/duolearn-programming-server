@@ -62,11 +62,11 @@ export class UserController {
   @Put('/usuario/modificar/:id')
   async modificarUsuario(@Body() data: UpdateUserDto, @Param('id') id: number) {
     try {
-        const { nombres, apellidos, correo, fecha_nacimiento } = data;
-        const status = await this.user.modificarUser(id, nombres, apellidos, correo, fecha_nacimiento);
-        console.log(status);
-        if (status === 1) return { mensaje: 'Modificado con exito', estado: '1' };
-        else return { mensaje: 'Modificación fallida ', estado: '0' };
+      const { nombres, apellidos, correo, fecha_nacimiento } = data;
+      const status = await this.user.modificarUser(id, nombres, apellidos, correo, fecha_nacimiento);
+      console.log(status);
+      if (status === 1) return { mensaje: 'Modificado con exito', estado: '1' };
+      else return { mensaje: 'Modificación fallida ', estado: '0' };
     } catch (error) {
       return { mensaje: 'Error: ' + error, estado: '0' };
     }
